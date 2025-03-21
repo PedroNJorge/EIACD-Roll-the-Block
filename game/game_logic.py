@@ -1,7 +1,7 @@
 class GameLogic:
-    def __init__(self, board, block):
-        self.board = board
+    def __init__(self, block, board):
         self.block = block
+        self.board = board
         self.game_over = False
 
     def check_win(self):
