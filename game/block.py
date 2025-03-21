@@ -1,14 +1,8 @@
 class Block:
     def __init__(self, x, y):
-        '''
-        self.x -> gives the x coordinate
-        self.y -> gives the y coordinate
-        self.orientation -> gives the orientation
-                            ("upright", "vertical", "horizontal")
-        '''
         self.x = x
         self.y = y
-        self.orientation = "upright"
+        self.orientation = "upright"    # "upright", "vertical", "horizontal"
 
     def move(self, direction):
         match direction:
