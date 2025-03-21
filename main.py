@@ -1,22 +1,32 @@
 import pygame
+from game import Board
+from game import Block
+from game import GameLogic
+from game import Renderer
+from game import InputHandler
 
-width, height = 800, 600
-run = True
-move_counter = 0
 
-# Initialize pygame
-pygame.init()
-screen = pygame.display.set_mode((width, height))
-pygame.display.set_caption("Roll the Block")
+def main():
+    width, height = 800, 600
+    run = True
+    move_counter = 0
 
-while run:
-    #use input handler
+    pygame.init()
+    screen = pygame.display.set_mode((width, height))
+    pygame.display.set_caption("Roll the Block")
 
-    # Fill the screen with a color (optional)
-    screen.fill((0, 0, 0))  # Black color
+    while run:
+        #use input handler
 
-    # Update the display
-    pygame.display.flip()
+        # Fill the screen with a color (optional)
+        screen.fill((0, 0, 0))  # Black color
 
-# Quit pygame
-pygame.quit()
+        # Update the display
+        pygame.display.flip()
+
+    # Quit pygame
+    pygame.quit()
+
+
+if __name__ == "__main__":
+    main()
