@@ -9,3 +9,6 @@ class Board:
 
     def is_goal(self, position):
         return self.level.is_goal(position)
+
+    def is_fatal(self, position):
+        pass

@@ -8,7 +8,7 @@ class GameLogic:
         return self.board.is_goal((self.block.x, self.block.y))
 
     def check_lose(self):
-        pass
+        return self.board.is_fatal((self.block.x, self.block.y))
 
     def update(self):
         if self.check_win():

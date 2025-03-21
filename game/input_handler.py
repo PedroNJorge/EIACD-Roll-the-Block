@@ -14,7 +14,7 @@ class InputHandler:
                     return False    # used to update run in main.py
 
         return True
-        
+
     def handle_keyboard(self, event):
         match(event.key):
             case pygame.K_w:
@@ -45,7 +45,7 @@ class InputHandler:
                     case "horizontal":
                         self.board.level.layout[self.block.x + 1][self.block.y] = 0
                         self.board.level.layout[self.block.x + 2][self.block.y] = 1
-                    
+
                     case "vertical":
                         self.board.level.layout[self.block.x][self.block.y + 1] = 0
                         self.board.level.layout[self.block.x + 1][self.block.y] = 2
@@ -64,7 +64,7 @@ class InputHandler:
                         self.board.level.layout[self.block.x + 1][self.block.y] = 0
                         self.board.level.layout[self.block.x][self.block.y - 1] = 2
                         self.board.level.layout[self.block.x + 1][self.block.y - 1] = 2
-                    
+
                     case "vertical":
                         self.board.level.layout[self.block.x][self.block.y - 1] = 0
                         self.board.level.layout[self.block.x][self.block.y - 2] = 1
@@ -82,11 +82,11 @@ class InputHandler:
                         self.board.level.layout[self.block.x + 1][self.block.y] = 0
                         self.board.level.layout[self.block.x][self.block.y + 1] = 2
                         self.board.level.layout[self.block.x + 1][self.block.y + 1] = 2
-                    
+
                     case "vertical":
                         self.board.level.layout[self.block.x][self.block.y + 1] = 0
                         self.board.level.layout[self.block.x][self.block.y + 2] = 1
-                        
+
                 self.block.move("right")
 
         self.game_logic.update()
