@@ -13,6 +13,9 @@ class InputHandler:
                 case pygame.QUIT:
                     return False    # used to update run in main.py
 
+                case pygame.KEYDOWN:
+                    self.handle_events(event)
+
         return True
 
     def handle_keyboard(self, event):

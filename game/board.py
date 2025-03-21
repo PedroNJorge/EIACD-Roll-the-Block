@@ -1,4 +1,4 @@
-import Levels
+from .levels import Levels
 
 
 class Board:
