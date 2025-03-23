@@ -1,10 +1,14 @@
 import pygame
+from pprint import pprint
 from game import Board
 from game import Block
 from game import GameLogic
 from game import InputHandler
 from game import Levels
 from game import Renderer
+from utils import LevelType
+from utils import TileType
+from utils import Colors
 
 
 def main():
@@ -22,13 +26,15 @@ def main():
     input_handler = InputHandler(block, board, game_logic)
     renderer = Renderer(block, board, width, height)
 
+    pprint(board.level.layout)
+    print("---------------------------------")
+
     while run:
         run = input_handler.handle_events()
 
         if (not run):
             break
 
-        print(board.level.layout)
         # Fill the screen with a color (optional)
         renderer.screen.fill((0, 0, 0))  # Black color
 
