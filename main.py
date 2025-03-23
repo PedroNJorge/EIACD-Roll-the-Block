@@ -15,7 +15,6 @@ def main():
     # create utils
     width, height = 800, 600
     run = True
-    move_counter = 0
 
     pygame.init()
     pygame.display.set_caption("Roll the Block")
@@ -40,6 +39,16 @@ def main():
 
         # Update the display
         pygame.display.flip()
+
+        if game_logic.game_over:
+            # press r to restart
+            # Idea: make z undo button
+            break
+
+        if game_logic.level_completed:
+            print(f"Total moves made: {block.move_counter}")
+            game_logic.level_completed = False
+            block.move_counter = 0
 
     pygame.quit()
 

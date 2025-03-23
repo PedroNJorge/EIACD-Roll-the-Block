@@ -11,4 +11,10 @@ class Board:
         return self.level.is_goal(position)
 
     def is_fatal(self, position):
-        pass
+        print(list(map(self.level.get_tiletype, position)))
+        if "VOID" in map(self.level.get_tiletype, position):
+            return True
+
+    def switch_level(self):
+        next_level = self.level.switch_level()
+        self.level = Levels(next_level)
