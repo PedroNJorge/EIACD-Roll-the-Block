@@ -31,7 +31,7 @@ levels = {
         "LEVEL1": {
             "layout": [[5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5],
                        [5, 0, 0, 0, 5, 5, 5, 5, 5, 5, 5, 5],
-                       [5, 0, 1, 0, 0, 0, 0, 5, 5, 5, 5, 5],
+                       [5, 0, 0, 0, 0, 0, 0, 5, 5, 5, 5, 5],
                        [5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 5],
                        [5, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5],
                        [5, 5, 5, 5, 5, 5, 0, 0, 7, 0, 0, 5],
@@ -43,8 +43,10 @@ levels = {
             #maybe insert hidden path here
             },
 
-        "LEVEL2": []
+        # "LEVEL2": []
         }
+
+NUM_LEVELS = len(levels)
 
 
 class Levels:
@@ -81,7 +83,7 @@ class Levels:
 
     def switch_level(self):
         level_num = reverse_level_menu[self.level_name]
-        self.level_name = level_menu[(level_num + 1) % 9]
+        self.level_name = level_menu[(level_num + 1) % NUM_LEVELS + 1]
         self.level_data = levels[self.level_name]
         self.layout = deepcopy(self.level_data["layout"])
         self.start = self.level_data["start"]

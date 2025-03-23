@@ -12,17 +12,14 @@ class Block:
             case "upright":
                 match direction:
                     case "up":
-                        self.x2 -= 1
                         self.x1 -= 2
-
+                        self.x2 -= 1
                     case "down":
                         self.x1 += 1
                         self.x2 += 2
-
                     case "left":
-                        self.y2 -= 1
                         self.y1 -= 2
-
+                        self.y2 -= 1
                     case "right":
                         self.y1 += 1
                         self.y2 += 2
@@ -31,14 +28,11 @@ class Block:
                 match direction:
                     case "up":
                         self.x1 = self.x2 = min(self.x1, self.x2) - 1
-
                     case "down":
                         self.x1 = self.x2 = max(self.x1, self.x2) + 1
-
                     case "left":
                         self.y1 -= 1
                         self.y2 -= 1
-
                     case "right":
                         self.y1 += 1
                         self.y2 += 1
@@ -48,14 +42,11 @@ class Block:
                     case "up":
                         self.x1 -= 1
                         self.x2 -= 1
-
                     case "down":
                         self.x1 += 1
                         self.x2 += 1
-
                     case "left":
                         self.y1 = self.y2 = min(self.y1, self.y2) - 1
-
                     case "right":
                         self.y1 = self.y2 = max(self.y1, self.y2) + 1
 

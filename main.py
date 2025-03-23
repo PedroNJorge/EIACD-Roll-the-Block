@@ -4,11 +4,7 @@ from game import Board
 from game import Block
 from game import GameLogic
 from game import InputHandler
-from game import Levels
 from game import Renderer
-from utils import LevelType
-from utils import TileType
-from utils import Colors
 
 
 def main():
@@ -25,6 +21,7 @@ def main():
     input_handler = InputHandler(block, board, game_logic)
     renderer = Renderer(block, board, width, height)
 
+    board.refresh_layout(block)
     pprint(board.level.layout)
     print("---------------------------------")
 
@@ -48,7 +45,9 @@ def main():
         if game_logic.level_completed:
             print(f"Total moves made: {block.move_counter}")
             game_logic.level_completed = False
-            block.move_counter = 0
+            block = Block(board.level.start[0], board.level.start[1])
+            pprint(board.level.layout)
+            print("HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH")
 
     pygame.quit()
 
