@@ -13,7 +13,6 @@ class InputHandler:
             match event.type:
                 case pygame.QUIT:
                     return False    # used to update run in main.py
-
                 case pygame.KEYDOWN:
                     self.handle_keyboard(event)
 
@@ -23,13 +22,10 @@ class InputHandler:
         match event.key:
             case pygame.K_w:
                 self.block.move("up")
-
             case pygame.K_s:
                 self.block.move("down")
-
             case pygame.K_a:
                 self.block.move("left")
-
             case pygame.K_d:
                 self.block.move("right")
 
