@@ -16,4 +16,4 @@ class GameLogic:
             self.game_over = True
         elif self.check_lose():
             print("lose")
-            self.game_over = True
+            self.game_over = False

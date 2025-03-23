@@ -1,4 +1,5 @@
 import pygame
+from pprint import pprint
 
 
 class InputHandler:
@@ -14,7 +15,7 @@ class InputHandler:
                     return False    # used to update run in main.py
 
                 case pygame.KEYDOWN:
-                    self.handle_events(event)
+                    self.handle_keyboard(event)
 
         return True
 
@@ -93,3 +94,5 @@ class InputHandler:
                 self.block.move("right")
 
         self.game_logic.update()
+        pprint(self.board.level.layout)
+        print("---------------------------------")

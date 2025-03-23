@@ -2,7 +2,7 @@ levels = {
         "LEVEL1": {
             "layout": [[-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
                        [-1,  0,  0,  0, -1, -1, -1, -1, -1, -1, -1, -1],
-                       [-1,  0,  0,  0,  0,  0,  0, -1, -1, -1, -1, -1],
+                       [-1,  0,  1,  0,  0,  0,  0, -1, -1, -1, -1, -1],
                        [-1,  0,  0,  0,  0,  0,  0,  0,  0,  0, -1, -1],
                        [-1, -1,  0,  0,  0,  0,  0,  0,  0,  0,  0, -1],
                        [-1, -1, -1, -1, -1, -1,  0,  0,  7,  0,  0, -1],
@@ -24,8 +24,8 @@ class Levels:
         self.start = self.level_data["start"]
         self.goal = self.level_data["goal"]
 
-    def get_tiletype(self, x, y):
+    def get_tiletype(self, position):
         pass
 
-    def is_goal(self, x, y):
-        return (x, y) == self.goal
+    def is_goal(self, position):
+        return position == self.goal
