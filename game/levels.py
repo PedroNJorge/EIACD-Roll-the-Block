@@ -12,15 +12,15 @@ from copy import deepcopy
                        [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],],
 '''
 level_menu = {
-            1: "LEVEL1",
-            2: "LEVEL2",
-            3: "LEVEL3",
-            4: "LEVEL4",
-            5: "LEVEL5",
-            6: "LEVEL6",
-            7: "LEVEL7",
-            8: "LEVEL8",
-            9: "LEVEL9"
+            0: "LEVEL1",
+            1: "LEVEL2",
+            2: "LEVEL3",
+            3: "LEVEL4",
+            4: "LEVEL5",
+            5: "LEVEL6",
+            6: "LEVEL7",
+            7: "LEVEL8",
+            8: "LEVEL9"
             }
 
 
@@ -43,7 +43,23 @@ levels = {
             #maybe insert hidden path here
             },
 
-        # "LEVEL2": []
+        "LEVEL2": {
+            "layout": [[5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5],
+                       [5, 5, 5, 5, 0, 0, 0, 0, 0, 0, 0, 0, 5, 5, 5, 5, 5],
+                       [5, 5, 5, 5, 0, 0, 0, 0, 0, 0, 0, 0, 5, 5, 5, 5, 5],
+                       [5, 0, 0, 0, 0, 5, 5, 5, 5, 5, 5, 0, 0, 0, 5, 5, 5],
+                       [5, 0, 0, 0, 5, 5, 5, 5, 5, 5, 5, 5, 0, 0, 5, 5, 5],
+                       [5, 0, 0, 0, 5, 5, 5, 5, 5, 5, 5, 5, 0, 0, 5, 5, 5],
+                       [5, 0, 0, 0, 5, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5],
+                       [5, 0, 0, 0, 5, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5],
+                       [5, 5, 5, 5, 5, 5, 0, 7, 0, 5, 5, 0, 0, 0, 0, 0, 5],
+                       [5, 5, 5, 5, 5, 5, 0, 0, 0, 5, 5, 0, 0, 0, 0, 0, 5],
+                       [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5]],
+
+            "start": (6, 2),
+
+            "goal": (8, 7)
+            }
         }
 
 NUM_LEVELS = len(levels)
@@ -83,7 +99,7 @@ class Levels:
 
     def switch_level(self):
         level_num = reverse_level_menu[self.level_name]
-        self.level_name = level_menu[(level_num + 1) % NUM_LEVELS + 1]
+        self.level_name = level_menu[(level_num + 1) % NUM_LEVELS]
         self.level_data = levels[self.level_name]
         self.layout = deepcopy(self.level_data["layout"])
         self.start = self.level_data["start"]
