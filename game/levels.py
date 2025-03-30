@@ -72,8 +72,14 @@ class Levels:
         self.layout = deepcopy(self.level_data["layout"])
         self.start = self.level_data["start"]
         self.goal = self.level_data["goal"]
+        self.width = len(self.layout[0])
+        self.height = len(self.layout)
 
     def get_tiletype(self, position):
+        x, y = position
+        if not (0 <= x <= self.height and 0 <= y <= self.width):
+            return "VOID"
+
         match levels[self.level_name]["layout"][position[0]][position[1]]:
             case -2:
                 return "HIDDEN_PATH"

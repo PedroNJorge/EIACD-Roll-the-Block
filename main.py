@@ -1,10 +1,15 @@
+from collections import deque
 import pygame
 from pprint import pprint
+import time
 from game import Board
 from game import Block
 from game import GameLogic
 from game import InputHandler
 from game import Renderer
+from search_algorithms import breadth_first_search
+from search_algorithms import uniform_cost_search
+from search_algorithms import Problem
 
 
 def main():
@@ -23,7 +28,25 @@ def main():
 
     board.refresh_layout(block)
     pprint(board.level.layout)
-    print("---------------------------------")
+    print("---------------------STARTING-----------------------------")
+
+    start = time.perf_counter()
+    solution_node = breadth_first_search(Problem(block, board))
+    end = time.perf_counter()
+    print(f"Algorithm took {(end - start)*1000:.6f} ms")
+    if solution_node is not None:
+        print("---------------------FINISHED-----------------------------")
+        pprint(solution_node.state)
+
+        solution = deque()
+        prev_node = solution_node.parent
+        solution.appendleft(solution_node.action)
+        while prev_node is not None:
+            pprint(prev_node.state)
+            solution.appendleft(prev_node.action)
+            prev_node = prev_node.parent
+        print(solution)
+        run = False
 
     while run:
         run = input_handler.handle_events()
@@ -46,8 +69,10 @@ def main():
             print(f"Total moves made: {block.move_counter}")
             game_logic.level_completed = False
             block = Block(board.level.start[0], board.level.start[1])
+            board.refresh_layout(block)
+            print(f"({block.x1}, {block.y1}), ({block.x2}, {block.y2})")
             pprint(board.level.layout)
-            print("HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH")
+            print("---------------------------------")
 
     pygame.quit()
 

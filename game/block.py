@@ -6,14 +6,35 @@ class Block:
         self.orientation = "upright"    # "upright", "vertical", "horizontal"
         self.move_counter = 0
 
+    def __str__(self):
+        return f"(({self.x1}, {self.y1}),({self.x2}, {self.y2})): {self.orientation}"
+
+    def __repr__(self):
+        return self.__str__()
+
+    def __eq__(self, other):
+        return (
+                isinstance(other, Block)
+                and self.x1 == other.x1
+                and self.x2 == other.x2
+                and self.y1 == other.y1
+                and self.y2 == other.y2
+                and self.orientation == other.orientation
+        )
+
+    def __hash__(self):
+        return hash((self.x1, self.y1, self.x2, self.y2, self.orientation))
+
     def move(self, direction):
         self.move_counter += 1
         match self.orientation:
             case "upright":
                 match direction:
                     case "up":
+                        print(f"({self.x1}, {self.y1}), ({self.x2}, {self.y2})")
                         self.x1 -= 2
                         self.x2 -= 1
+                        print(f"({self.x1}, {self.y1}), ({self.x2}, {self.y2})")
                     case "down":
                         self.x1 += 1
                         self.x2 += 2
