@@ -33,12 +33,13 @@ def main():
     print("---------------------STARTING-----------------------------")
 
     start = time.perf_counter()
-    solution_node = breadth_first_search(Problem(block, board))
+    # solution_node = breadth_first_search(Problem(block, board))
     # solution_node = a_star(Problem(block, board))
     # solution_node = greedy_search(Problem(block, board))
     # solution_node = iterative_deepening_search(Problem(block, board))
     end = time.perf_counter()
 
+    '''
     if solution_node is not None:
         print("---------------------FINISHED-----------------------------")
         pprint(solution_node.state)
@@ -60,6 +61,7 @@ def main():
         run = False
     else:
         print("Couldn't find a solution!")
+    '''
     while run:
         run = input_handler.handle_events()
         # print(block)

@@ -6,6 +6,7 @@ from .levels import Levels, levels
 class Board:
     def __init__(self, level_name):
         self.level = Levels(level_name)
+        self.button_is_active = 0
 
     def __str__(self):
         pprint(self.level.layout)
@@ -27,12 +28,27 @@ class Board:
         tiles_list = list(map(self.level.get_tiletype, position))
         if "VOID" in tiles_list:
             return True
+        elif "HIDDEN_PATH" in tiles_list and not self.button_is_active:
+            return True
+        elif tiles_list.count("BUTTON") == 2:
+            self.button_is_active = not self.button_is_active
         elif block.orientation == "upright" and tiles_list.count("GLASS_FLOOR") == 2:
             return True
         return False
 
     def refresh_layout(self, block):
         self.level.layout = deepcopy(levels[self.level.level_name]["layout"])
+
+        if self.level.hidden_path:
+            if self.button_is_active:
+                for x, y in self.level.hidden_path:
+                    self.level.layout[x][y] = 0
+            else:
+                for x, y in self.level.hidden_path:
+                    '''
+                    Mudar para -1 ("VOID")
+                    '''
+                    self.level.layout[x][y] = 5
 
         if block.orientation == "upright":
             self.level.layout[block.x1][block.y1] = 1
