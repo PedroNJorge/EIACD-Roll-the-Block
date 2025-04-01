@@ -1,5 +1,5 @@
 class Node:
-    def __init__(self, state, parent=None, action=None, path_cost=0):
+    def __init__(self, state, parent=None, action=None, path_cost=0, depth=0):
         '''
         self.state <- state to which node corresponds,
                                             tuple (block, board_layout)
@@ -13,6 +13,7 @@ class Node:
         self.parent = parent
         self.action = action
         self.path_cost = path_cost
+        self.depth = depth
 
     def __lt__(self, other):
         return self.path_cost < other.path_cost

@@ -1,30 +1,30 @@
 import heapq
 from pprint import pprint
 from .expand import expand
+from .heuristic import h
 from .node import Node
 
-'''
-!!!!!!!!!!!!!
-Since ACTION-COST(s, action, s') = 1,
-        uniform_cost_search behaves exactly like breadth_first_search
-'''
+
+def g(node, problem):
+    f = node.path_cost
+    return f + h(node, problem)
 
 
-def uniform_cost_search(problem):
+def a_star(problem):
     node = Node(problem.initial)
-    frontier = [node]
+    frontier = [(g(node, problem), node)]
     reached = {problem.initial: node}
 
     while frontier:
-        node = heapq.heappop(frontier)
+        node = heapq.heappop(frontier)[1]
         if problem.is_goal(node.state):
             return node
 
         for child in expand(problem, node):
             s = child.state
-            if s not in reached.keys() or child.path_cost < reached[s].path_cost:
+            if s not in reached.keys() or g(child, problem) < g(reached[s], problem):
                 reached[s] = child
-                heapq.heappush(frontier, child)
+                heapq.heappush(frontier, (g(child, problem), child))
 
     return None
 

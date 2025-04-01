@@ -9,7 +9,8 @@ def expand(problem, node):
         print(action)
         s_prime = problem.result(s, action)
         cost = node.path_cost + problem.action_cost(s, action, s_prime)
-        generated_nodes.add(Node(s_prime, parent=node, action=action, path_cost=cost))
+        depth = node.depth + 1
+        generated_nodes.add(Node(s_prime, parent=node, action=action, path_cost=cost, depth=depth))
 
     return generated_nodes
 
