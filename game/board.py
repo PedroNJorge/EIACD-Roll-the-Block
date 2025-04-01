@@ -8,7 +8,8 @@ class Board:
         self.level = Levels(level_name)
 
     def __str__(self):
-        return self.level.layout
+        pprint(self.level.layout)
+        return ""
 
     def __eq__(self, other):
         if not isinstance(other, Board):
@@ -21,9 +22,14 @@ class Board:
     def is_goal(self, position):
         return self.level.is_goal(position)
 
-    def is_fatal(self, position):
-        if "VOID" in map(self.level.get_tiletype, position):
+    def is_fatal(self, block):
+        position = ((block.x1, block.y1), (block.x2, block.y2))
+        tiles_list = list(map(self.level.get_tiletype, position))
+        if "VOID" in tiles_list:
             return True
+        elif block.orientation == "upright" and tiles_list.count("GLASS_FLOOR") == 2:
+            return True
+        return False
 
     def refresh_layout(self, block):
         self.level.layout = deepcopy(levels[self.level.level_name]["layout"])

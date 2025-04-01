@@ -11,13 +11,12 @@ class GameLogic:
             return self.board.is_goal((self.block.x1, self.block.y1))
 
     def check_lose(self):
-        return self.board.is_fatal(((self.block.x1, self.block.y1), (self.block.x2, self.block.y2)))
+        return self.board.is_fatal(self.block)
 
     def update(self):
         if self.check_win():
             print("win")
             self.level_completed = True
-            self.board.switch_level()
         elif self.check_lose():
             print("lose")
             self.game_over = True
