@@ -12,10 +12,14 @@ class Board:
         pprint(self.level.layout)
         return ""
 
+    def __repr__(self):
+        self.__str__()
+        return ""
+
     def __eq__(self, other):
         if not isinstance(other, Board):
             return False
-        return tuple(map(tuple, self.level.layout)) == tuple(map(tuple, other.level.layout))
+        return tuple(map(tuple, self.level.layout)) == tuple(map(tuple, other.level.layout)) and self.button_is_active == other.button_is_active
 
     def __hash__(self):
         return hash(tuple(map(tuple, self.level.layout)))
@@ -30,14 +34,17 @@ class Board:
             return True
         elif "HIDDEN_PATH" in tiles_list and not self.button_is_active:
             return True
-        elif tiles_list.count("BUTTON") == 2:
-            self.button_is_active = not self.button_is_active
         elif block.orientation == "upright" and tiles_list.count("GLASS_FLOOR") == 2:
             return True
         return False
 
     def refresh_layout(self, block):
         self.level.layout = deepcopy(levels[self.level.level_name]["layout"])
+        position = ((block.x1, block.y1), (block.x2, block.y2))
+        tiles_list = list(map(self.level.get_tiletype, position))
+
+        if tiles_list.count("BUTTON") == 2:
+            self.button_is_active = not self.button_is_active
 
         if self.level.hidden_path:
             if self.button_is_active:

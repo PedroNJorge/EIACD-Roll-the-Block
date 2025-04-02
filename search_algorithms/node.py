@@ -1,3 +1,6 @@
+from copy import deepcopy
+
+
 class Node:
     def __init__(self, state, parent=None, action=None, path_cost=0, depth=0):
         '''
@@ -9,11 +12,18 @@ class Node:
         self.path_cost <- total cost of the path from the initial state
                                             to this node
         '''
-        self.state = state
+        self.state = deepcopy(state)
         self.parent = parent
         self.action = action
         self.path_cost = path_cost
         self.depth = depth
 
+    def __eq__(self, other):
+        return self.state == other.state
+
+    def __hash__(self):
+        return hash(self.state)
+
     def __lt__(self, other):
         return self.path_cost < other.path_cost
+

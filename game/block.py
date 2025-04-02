@@ -31,10 +31,8 @@ class Block:
             case "upright":
                 match direction:
                     case "up":
-                        print(f"({self.x1}, {self.y1}), ({self.x2}, {self.y2})")
                         self.x1 -= 2
                         self.x2 -= 1
-                        print(f"({self.x1}, {self.y1}), ({self.x2}, {self.y2})")
                     case "down":
                         self.x1 += 1
                         self.x2 += 2

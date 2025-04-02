@@ -1,6 +1,7 @@
 from collections import deque
 from .node import Node
 from .expand import expand
+from pprint import pprint
 
 
 def breadth_first_search(problem):
@@ -11,6 +12,7 @@ def breadth_first_search(problem):
     frontier = deque([node])
     reached = {problem.initial: node}
 
+    pprint(node.state)
     while frontier:
         node = frontier.popleft()
         for child in expand(problem, node):

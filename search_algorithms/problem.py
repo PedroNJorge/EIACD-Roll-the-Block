@@ -5,39 +5,52 @@ from pprint import pprint
 
 
 class Problem:
-    def __init__(self, block, board):
-        self.initial = (block, tuple(map(tuple, board.level.layout)))
+    def __init__(self, block, board, layout_only=False):
+        self.layout_only = layout_only
+        if layout_only:
+            self.initial = (block, tuple(map(tuple, board.level.layout)))
+        else:
+            self.initial = (block, board)
         self.level_name = board.level.level_name
 
     def actions(self, state):
         valid_actions = []
+        '''
         print("|||||||||||||||Current state||||||||||||||||||")
-        print(state[0])
-        pprint(state[1])
+        pprint(state)
+        '''
         for action in ["up", "down", "left", "right"]:
             ghost_block = deepcopy(state[0])
             ghost_block.move(action)
             ghost_board = Board(self.level_name)
             ghost_game_logic = GameLogic(ghost_block, ghost_board)
+            '''
             print("~~~~ACTION~~~~: ", action)
             print("GHOST: ", ghost_block)
             print("CURR STATE: ", state[0])
             print("~~~~~~~~~~~~~~")
+            '''
 
             if not ghost_game_logic.check_lose():
                 valid_actions.append(action)
 
+        '''
         print("Valid actions:", valid_actions)
         print("||||||||||||||||||||||||||||||||||||||||||||||")
+        '''
         return valid_actions
 
     def result(self, state, action):
         block = deepcopy(state[0])
         block.move(action)
-        board = Board(self.level_name)
-        board_layout = board.refresh_layout(block)
-
-        return (block, tuple(map(tuple, board_layout)))
+        if self.layout_only:
+            board = Board(self.level_name)
+            board.refresh_layout(block)
+            return (block, tuple(map(tuple, board.level.layout)))
+        else:
+            board = deepcopy(state[1])
+            board.refresh_layout(block)
+            return (block, board)
 
     def action_cost(self, state, action, next_state):
         return 1

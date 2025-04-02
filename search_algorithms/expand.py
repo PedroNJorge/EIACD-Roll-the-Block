@@ -6,7 +6,6 @@ def expand(problem, node):
     generated_nodes = set()
 
     for action in problem.actions(s):
-        print(action)
         s_prime = problem.result(s, action)
         cost = node.path_cost + problem.action_cost(s, action, s_prime)
         depth = node.depth + 1

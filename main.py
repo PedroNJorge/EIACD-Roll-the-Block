@@ -22,7 +22,7 @@ def main():
     pygame.init()
     pygame.display.set_caption("Roll the Block")
 
-    board = Board("LEVEL3")
+    board = Board("LEVEL2")
     block = Block(board.level.start[0], board.level.start[1])
     game_logic = GameLogic(block, board)
     input_handler = InputHandler(block, board, game_logic)
@@ -34,12 +34,12 @@ def main():
 
     start = time.perf_counter()
     # solution_node = breadth_first_search(Problem(block, board))
-    # solution_node = a_star(Problem(block, board))
+    solution_node = a_star(Problem(block, board))
     # solution_node = greedy_search(Problem(block, board))
     # solution_node = iterative_deepening_search(Problem(block, board))
     end = time.perf_counter()
+    print(f"Algorithm took {(end - start)*1000:.6f} ms")
 
-    '''
     if solution_node is not None:
         print("---------------------FINISHED-----------------------------")
         pprint(solution_node.state)
@@ -57,11 +57,11 @@ def main():
         solution.popleft()
         print(solution)
         print(f"Moves made: {len(solution)}")
-        print(f"Algorithm took {(end - start)*1000:.6f} ms")
         run = False
     else:
         print("Couldn't find a solution!")
-    '''
+        pygame.quit()
+
     while run:
         run = input_handler.handle_events()
         # print(block)
