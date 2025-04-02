@@ -17,13 +17,12 @@ def a_star(problem):
 
     while frontier:
         node = heapq.heappop(frontier)[1]
+        print(type(node.state[1]))
 
-        '''
-        if node.state[1].level.layout[7][4] == 0:
+        if node.state[1].button_is_active:
             pprint(node.state)
             for child in expand(problem, node):
                 pprint(child.state)
-        '''
 
         if problem.is_goal(node.state):
             return node

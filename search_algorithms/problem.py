@@ -22,7 +22,10 @@ class Problem:
         for action in ["up", "down", "left", "right"]:
             ghost_block = deepcopy(state[0])
             ghost_block.move(action)
-            ghost_board = Board(self.level_name)
+            if self.layout_only:
+                ghost_board = Board(self.level_name)
+            else:
+                ghost_board = deepcopy(state[1])
             ghost_game_logic = GameLogic(ghost_block, ghost_board)
             '''
             print("~~~~ACTION~~~~: ", action)

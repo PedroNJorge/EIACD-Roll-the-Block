@@ -22,7 +22,7 @@ class Board:
         return tuple(map(tuple, self.level.layout)) == tuple(map(tuple, other.level.layout)) and self.button_is_active == other.button_is_active
 
     def __hash__(self):
-        return hash(tuple(map(tuple, self.level.layout)))
+        return hash((tuple(map(tuple, self.level.layout)), self.button_is_active))
 
     def is_goal(self, position):
         return self.level.is_goal(position)
