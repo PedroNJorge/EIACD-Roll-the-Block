@@ -7,13 +7,14 @@ from game import Block
 from game import GameLogic
 from game import InputHandler
 from game import Renderer
+from search_algorithms import Problem
 from search_algorithms import a_star
 from search_algorithms import breadth_first_search
+from search_algorithms import depth_first_search
 from search_algorithms import depth_limited_search
 from search_algorithms import greedy_search
 from search_algorithms import iterative_deepening_search
 from search_algorithms import uniform_cost_search
-from search_algorithms import Problem
 
 
 def main():
@@ -32,11 +33,20 @@ def main():
     pprint(board.level.layout)
     print("---------------------STARTING-----------------------------")
 
+    if board.level.button:
+        layout_only = False
+    else:
+        layout_only = True
+
+    problem = Problem(block, board, layout_only=layout_only)
+
     start = time.perf_counter()
-    # solution_node = breadth_first_search(Problem(block, board))
-    solution_node = a_star(Problem(block, board))
-    # solution_node = greedy_search(Problem(block, board))
-    # solution_node = iterative_deepening_search(Problem(block, board))
+    # solution_node = a_star(problem)
+    # solution_node = breadth_first_search(problem)
+    solution_node = depth_first_search(problem)
+    # solution_node = depth_limited_search(problem, 100000)
+    # solution_node = greedy_search(problem)
+    # solution_node = iterative_deepening_search(problem)
     end = time.perf_counter()
     print(f"Algorithm took {(end - start)*1000:.6f} ms")
 
@@ -64,7 +74,6 @@ def main():
 
     while run:
         run = input_handler.handle_events()
-        # print(block)
 
         if (not run):
             break
