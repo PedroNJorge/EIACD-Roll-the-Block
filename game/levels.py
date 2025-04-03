@@ -240,7 +240,7 @@ levels = {
             "button": [(4, 8), (2, 14)],
 
             "hidden_path": [(6, 8), (4, 14)],
-            },
+            }
                        
 NUM_LEVELS = len(levels)
 
