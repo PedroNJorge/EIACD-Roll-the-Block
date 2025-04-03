@@ -186,7 +186,7 @@ levels = {
             "start": (5, 3),
 
             "goal": (5, 15), 
-
+                    
             "button": (6, 11),
 
             "hidden_path": [(6, 12), (6, 13)]
