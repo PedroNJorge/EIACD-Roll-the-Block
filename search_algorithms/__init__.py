@@ -1,5 +1,6 @@
 from .a_star import a_star
 from .breadth_first_search import breadth_first_search
+from .depth_first_search import depth_first_search
 from .expand import expand
 from .greedy_search import greedy_search
 from .heuristic import h

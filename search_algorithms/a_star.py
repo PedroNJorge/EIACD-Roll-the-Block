@@ -1,5 +1,4 @@
 import heapq
-from pprint import pprint
 from .expand import expand
 from .heuristic import h
 from .node import Node
@@ -17,19 +16,13 @@ def a_star(problem):
 
     while frontier:
         node = heapq.heappop(frontier)[1]
-        print(type(node.state[1]))
-
-        if node.state[1].button_is_active:
-            pprint(node.state)
-            for child in expand(problem, node):
-                pprint(child.state)
 
         if problem.is_goal(node.state):
             return node
 
         for child in expand(problem, node):
             s = child.state
-            if s not in reached.keys() or g(child, problem) < g(reached[s], problem):
+            if s not in reached or g(child, problem) < g(reached[s], problem):
                 reached[s] = child
                 heapq.heappush(frontier, (g(child, problem), child))
 

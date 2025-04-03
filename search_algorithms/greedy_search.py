@@ -16,7 +16,7 @@ def greedy_search(problem):
 
         for child in expand(problem, node):
             s = child.state
-            if s not in reached.keys() or h(child, problem) < h(reached[s], problem):
+            if s not in reached or h(child, problem) < h(reached[s], problem):
                 reached[s] = child
                 heapq.heappush(frontier, (h(child, problem), child))
 

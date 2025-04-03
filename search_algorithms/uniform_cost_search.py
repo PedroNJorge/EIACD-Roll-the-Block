@@ -1,5 +1,4 @@
 import heapq
-from pprint import pprint
 from .expand import expand
 from .node import Node
 
@@ -22,7 +21,7 @@ def uniform_cost_search(problem):
 
         for child in expand(problem, node):
             s = child.state
-            if s not in reached.keys() or child.path_cost < reached[s].path_cost:
+            if s not in reached or child.path_cost < reached[s].path_cost:
                 reached[s] = child
                 heapq.heappush(frontier, child)
 

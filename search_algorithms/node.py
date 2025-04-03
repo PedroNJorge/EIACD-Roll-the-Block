@@ -19,6 +19,8 @@ class Node:
         self.depth = depth
 
     def __eq__(self, other):
+        if not isinstance(other, Node):
+            return False
         return self.state == other.state
 
     def __hash__(self):
@@ -26,4 +28,3 @@ class Node:
 
     def __lt__(self, other):
         return self.path_cost < other.path_cost
-
