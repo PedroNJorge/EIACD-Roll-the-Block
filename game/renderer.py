@@ -8,10 +8,10 @@ class Renderer:
 import pygame
 import sys
 import os
-from block import Block
-from board import Board
-from game_logic import GameLogic
-from input_handler import InputHandler
+from game.block import Block
+from game.board import Board
+from game.game_logic import GameLogic
+from game.input_handler import InputHandler
 
 # Initialize pygame
 pygame.init()
