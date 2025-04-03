@@ -31,6 +31,8 @@ def main():
 
     board.refresh_layout(block)
     pprint(board.level.layout)
+
+    """
     print("---------------------STARTING-----------------------------")
 
     if board.level.button:
@@ -71,6 +73,7 @@ def main():
     else:
         print("Couldn't find a solution!")
         pygame.quit()
+    """
 
     while run:
         run = input_handler.handle_events()
