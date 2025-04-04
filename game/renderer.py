@@ -63,15 +63,15 @@ class Button:
 
 #Running the game itself
 class Renderer:
-        def __init__(self, screen, board, block):
+        def __init__(self, screen, block, board, game_logic, input_handler):
                 self.screen = screen
                 pygame.display.set_caption("Roll the Block!")
                 self.clock = pygame.time.Clock()
                 self.game_state = MAIN_MENU
-                self.block = None
-                self.board = None
-                self.game_logic = None
-                self.input_handler = None
+                self.block = block
+                self.board = board
+                self.game_logic = game_logic
+                self.input_handler = input_handler
                 self.init_buttons()
 
                 self.animation_active = False
