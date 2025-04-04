@@ -2,6 +2,7 @@ from collections import deque
 import pygame
 from pprint import pprint
 import time
+import sys
 from game import Board
 from game import Block
 from game import GameLogic
@@ -21,19 +22,19 @@ def main():
     run = True
 
     pygame.init()
-    pygame.display.set_caption("Roll the Block")
-    screen = pygame.display.set_mode((800, 600))
-    clock = pygame.time.Clock()
 
     board = Board("LEVEL1")
     block = Block(board.level.start[0], board.level.start[1])
     game_logic = GameLogic(block, board)
     input_handler = InputHandler(block, board, game_logic)
-    renderer = Renderer(screen, block, board)
+    renderer = Renderer(block, board, game_logic, input_handler)
 
     board.refresh_layout(block)
     pprint(board.level.layout)
 
+    renderer.run()
+    pygame.quit()
+    sys.exit()
     """
     print("---------------------STARTING-----------------------------")
 
@@ -77,6 +78,7 @@ def main():
         pygame.quit()
     """
 
+    '''
     while run:
         run = input_handler.handle_events()
 
@@ -105,6 +107,7 @@ def main():
             print(board)
 
     pygame.quit()
+    '''
 
 
 if __name__ == "__main__":

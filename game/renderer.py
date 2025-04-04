@@ -61,10 +61,11 @@ class Button:
         def is_clicked(self, mouse_pos, mouse_click):
                 return self.rect.collidepoint(mouse_pos) and mouse_click
 
-#Running the game itself
+
+# Running the game itself
 class Renderer:
-        def __init__(self, screen, block, board, game_logic, input_handler):
-                self.screen = screen
+        def __init__(self, block, board, game_logic, input_handler):
+                self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
                 pygame.display.set_caption("Roll the Block!")
                 self.clock = pygame.time.Clock()
                 self.game_state = MAIN_MENU
@@ -91,23 +92,15 @@ class Renderer:
 
         def init_buttons(self):
                 center_x = SCREEN_WIDTH // 2
-                self.play_button = Button(center_x - 100, 200, 200, 50, "Play", WHITE_CLOUD, (>
-        
+                self.play_button = Button(center_x - 100, 200, 200, 50, "Play", WHITE_CLOUD, HOT_PINK)
+
+        def update_animation(self):
+            pygame.display.flip()
+
         def run(self):
-        #Game loop
                 running = True
                 while running:
                         self.clock.tick(FPS)
-                        #running = self.handle_events()
-                        #self.update_animation()
-                        #self.draw()
-
-def main():
-    game = Renderer()
-    game.run()
-    pygame.quit()
-    sys.exit()
-
-
-if __name__ == "__main__":
-    main()
+                        running = self.input_handler.handle_events()
+                        self.draw()
+                        self.update_animation()
