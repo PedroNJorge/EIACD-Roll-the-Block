@@ -23,7 +23,7 @@ def main():
     pygame.init()
     pygame.display.set_caption("Roll the Block")
 
-    board = Board("LEVEL3")
+    board = Board("LEVEL1")
     block = Block(board.level.start[0], board.level.start[1])
     game_logic = GameLogic(block, board)
     input_handler = InputHandler(block, board, game_logic)
