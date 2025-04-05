@@ -160,7 +160,7 @@ class Renderer:
                 if self.game_state == MAIN_MENU:
                     quit_requested = self.handle_main_menu(mouse_pos)
                 elif self.game_state == RULES:
-                    self.handle_rules_screen(mouse_pos)
+                    self.handle_rules_screen(mouse_pos, True)
                 elif self.game_state == LEVEL_SELECT:
                     self.handle_level_select(mouse_pos)
                 elif self.game_state == PLAYING:
