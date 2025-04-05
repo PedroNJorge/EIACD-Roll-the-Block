@@ -26,8 +26,9 @@ def main():
     board = Board("LEVEL1")
     block = Block(board.level.start[0], board.level.start[1])
     game_logic = GameLogic(block, board)
-    input_handler = InputHandler(block, board, game_logic)
+    input_handler = InputHandler(block, board, game_logic, None)
     renderer = Renderer(block, board, game_logic, input_handler)
+    input_handler.renderer = renderer
 
     board.refresh_layout(block)
     pprint(board.level.layout)

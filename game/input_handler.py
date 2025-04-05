@@ -1,12 +1,21 @@
 import pygame
-from pprint import pprint
+
+
+# Game states
+MAIN_MENU = 0
+RULES = 1
+LEVEL_SELECT = 2
+PLAYING = 3
+GAME_OVER = 4
+LEVEL_COMPLETE = 5
 
 
 class InputHandler:
-    def __init__(self, block, board, game_logic):
+    def __init__(self, block, board, game_logic, renderer):
         self.block = block
         self.board = board
         self.game_logic = game_logic
+        self.renderer = renderer
 
     def handle_events(self):
         for event in pygame.event.get():
@@ -14,7 +23,10 @@ class InputHandler:
                 case pygame.QUIT:
                     return False    # used to update run in main.py
                 case pygame.KEYDOWN:
-                    self.handle_keyboard(event)
+                    if self.renderer.game_state == PLAYING:
+                        self.handle_keyboard(event)
+                case pygame.MOUSEMOTION | pygame.MOUSEBUTTONDOWN:
+                    self.handle_mouse(event)
 
         return True
 
@@ -32,6 +44,20 @@ class InputHandler:
         self.board.refresh_layout(self.block)
         self.game_logic.update()
 
-        pprint(self.board.level.layout)
-        print(f"(({self.block.x1}, {self.block.y1}), ({self.block.x2}, {self.block.y2}))")
-        print("---------------------------------")
+    def handle_mouse(self, event):
+        mouse_pos = pygame.mouse.get_pos()
+
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            match self.renderer.game_state:
+                case 0:
+                    self.renderer.handle_main_menu(mouse_pos)
+                case 1:
+                    self.renderer.handle_rules_screen(mouse_pos)
+                case 2:
+                    self.renderer.handle_level_select(mouse_pos)
+                case 3:
+                    self.renderer.handle_playing(mouse_pos)
+                case 4:
+                    self.renderer.handle_game_over(mouse_pos)
+                case 5:
+                    self.renderer.handle_level_complete(mouse_pos)
