@@ -75,3 +75,5 @@ conda create -f environment.yml
 
 ## Acknowledgments
 Inspired by the original Bloxorz game by Damien Clarke. This project was created for educational purposes to explore search algorithms in game AI.
+
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
