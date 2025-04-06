@@ -216,8 +216,22 @@ class Renderer:
         if self.back_button.is_clicked(mouse_pos):
             self.game_state = AI_OR_HUMAN
         for button in self.algorithm_buttons:
-            if button.is_clicked:
-                self.game_state = PLAYING
+            for i, button in enumerate(self.algorithm_buttons):
+            button.update(mouse_pos)
+            if button.is_clicked(mouse_pos):
+                algorithm_name = button.text.lower()
+                if algorithm_name == "a*":
+                    algorithm_name = "a_star"
+                elif algorithm_name == "bfs":
+                    algorithm_name = "bfs"
+                elif algorithm_name == "dfs":
+                    algorithm_name = "dfs"
+                elif algorithm_name == "greedy":
+                    algorithm_name = "greedy"
+                elif algorithm_name == "ucs":
+                    algorithm_name = "ucs"
+                elif algorithm_name == "ids":
+                    algorithm_name = "ids"
 
     def handle_level_select(self, mouse_pos):
         self.back_button.update(mouse_pos)
