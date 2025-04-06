@@ -3,6 +3,12 @@ from game.block import Block
 from game.board import Board
 from game.game_logic import GameLogic
 from game.input_handler import InputHandler
+import search_algorithms
+from search_algorithms import (
+        a_star, breadth_first_search, depth_first_search,
+        greedy_search, uniform_cost_search, iterative_deepening_search,
+        Problem
+    )
 
 # Constants
 SCREEN_WIDTH = 800
@@ -33,6 +39,8 @@ LEVEL_SELECT = 2
 PLAYING = 3
 GAME_OVER = 4
 LEVEL_COMPLETE = 5
+AI_OR_HUMAN = 6
+ALGORITHMS = 7
 
 
 # All buttons shape and color
@@ -87,11 +95,23 @@ class Renderer:
         center_x = SCREEN_WIDTH // 2
         # Main menu
         self.play_button = Button(center_x - 100, 200, 200, 50, "Play", WHITE_CLOUD, (204, 255, 204))
-        self.rules_button = Button(center_x - 100, 270, 200, 50, "Rules", WHITE_CLOUD, (204, 225, 204))
-        self.quit_button = Button(center_x -100, 340, 200, 50, "Quit", WHITE_CLOUD, (204, 225, 204))
+        self.rules_button = Button(center_x - 100, 270, 200, 50, "Rules", WHITE_CLOUD, (204, 255, 204))
+        # AI or Human
+        self.human_button = Button(center_x - 250, 200, 200, 50, "Human", WHITE_CLOUD, (204, 255, 204))
+        self.ai_button = Button(center_x + 70, 200, 200, 50, "AI", WHITE_CLOUD, (204, 255, 204))
 
         # Back from rules
         self.back_button = Button(center_x - 100, 500, 200, 50, "Back", WHITE_CLOUD, (204, 255, 204))
+
+        #Search algorithms
+        self.solve_button = Button(20, 100, 100, 40, "Solve", WHITE_CLOUD, (204, 255, 204))
+        self.algorithm_buttons = []
+        algorithms = ["A*", "BFS", "DFS", "Greedy", "UCS", "IDS"]
+        for i, algo in enumerate(algorithms):
+            self.algorithm_buttons.append(Button(130, 100 + i*50, 100, 40, algo, CYAN, (100, 255, 255)))
+        self.show_solution = False
+        self.solution_actions = []
+        self.solution_index = 0
 
         # Level select buttons
         self.level_buttons = []
@@ -130,20 +150,66 @@ class Renderer:
     def handle_main_menu(self, mouse_pos):
         self.play_button.update(mouse_pos)
         self.rules_button.update(mouse_pos)
-        self.quit_button.update(mouse_pos)
 
         if self.play_button.is_clicked(mouse_pos):
-            self.game_state = LEVEL_SELECT
+            self.game_state = AI_OR_HUMAN
         elif self.rules_button.is_clicked(mouse_pos):
             self.game_state = RULES
-        elif self.quit_button.is_clicked(mouse_pos):
-            self.running = False
 
     def handle_rules_screen(self, mouse_pos):
         self.back_button.update(mouse_pos)
 
         if self.back_button.is_clicked(mouse_pos):
             self.game_state = MAIN_MENU
+
+    def handle_ai_or_human(self, mouse_pos):
+        self.back_button.update(mouse_pos)
+        self.human_button.update(mouse_pos)
+        self.ai_button.update(mouse_pos)
+
+        if self.back_button.is_clicked(mouse_pos):
+            self.game_state = MAIN_MENU
+        elif self.human_button.is_clicked(mouse_pos):
+            self.game_state = LEVEL_SELECT
+        elif self.ai_button.is_clicked(mouse_pos):
+            self.game_state = ALGORITHMS
+
+    def handle_algorithms(self, mouse_pos):
+        self.back_button.update(mouse_pos)
+        for button in self.algorithm_buttons:
+            button.update(mouse_pos)
+
+        if self.back_button.is_clicked(mouse_pos):
+            self.game_state = AI_OR_HUMAN
+        for button in self.algorithm_buttons:
+            if button.is_clicked:
+                self.game_state = LEVEL_SELECT
+
+    def solving_algorithm(board, block, algorithm_name):
+        problem = Problem(block, board)
+
+        if algorithm_name == "a_star":
+            solution_node = a_star(problem)
+        elif algorithm_name == "bfs":
+            solution_node = breadth_first_search(problem)
+        elif algorithm_name == "dfs":
+            solution_node = depth_first_search(problem)
+        elif algorithm_name == "greedy":
+            solution_node = greedy_search(problem)
+        elif algorithm_name == "ucs":
+            solution_node = uniform_cost_search(problem)
+        elif algorithm_name == "ids":
+            solution_node = iterative_deepening_search(problem)
+
+        if solution_node is None:
+            return None
+
+        actions = []
+        while solution_node.parent is not None:
+            actions.append(solution_node.action)
+            solution_node = solution_node.parent
+
+        return actions [::-1]
 
     def handle_level_select(self, mouse_pos):
         self.back_button.update(mouse_pos)
@@ -157,6 +223,17 @@ class Renderer:
                 level_name = f"LEVEL{i+1}"
                 self.initialize_level(level_name)
                 self.game_state = PLAYING
+
+    def handle_game_over(self, mouse_pos):
+        self.restart_button.update(mouse_pos)
+        self.menu_button.update(mouse_pos)
+        self.retry_button.update(mouse_pos)
+
+        if self.retry_button.is_clicked(mouse_pos):
+            self.initialize_level(self.current_level)
+            self.game_state = PLAYING
+        elif self.menu_button.is_clicked(mouse_pos):
+            self.game_state = MAIN_MENU
 
     def handle_playing(self, mouse_pos):
         self.menu_button.update(mouse_pos)
@@ -172,16 +249,61 @@ class Renderer:
         elif self.game_logic.level_completed:
             self.game_state = LEVEL_COMPLETE
 
-    def handle_game_over(self, mouse_pos):
-        self.restart_button.update(mouse_pos)
-        self.menu_button.update(mouse_pos)
-        self.retry_button.update(mouse_pos)
+        # Handle solve button
+        self.solve_button.update(mouse_pos)
+        if self.solve_button.is_clicked(mouse_pos):
+            self.show_algorithm_selection = True
 
-        if self.restart_button.is_clicked(mouse_pos) or self.retry_button.is_clicked(mouse_pos):
-            self.initialize_level(self.current_level)
-            self.game_state = PLAYING
-        elif self.menu_button.is_clicked(mouse_pos):
-            self.game_state = MAIN_MENU
+        if hasattr(self, 'show_algorithm_selection') and self.show_algorithm_selection:
+            for i, button in enumerate(self.algorithm_buttons):
+                button.update(mouse_pos)
+                if button.is_clicked(mouse_pos):
+                    algorithm_name = button.text.lower()
+                    if algorithm_name == "a*":
+                        algorithm_name = "a_star"
+                    elif algorithm_name == "bfs":
+                        algorithm_name = "bfs"
+                    elif algorithm_name == "dfs":
+                        algorithm_name = "dfs"
+                    elif algorithm_name == "greedy":
+                        algorithm_name = "greedy"
+                    elif algorithm_name == "ucs":
+                        algorithm_name = "ucs"
+                    elif algorithm_name == "ids":
+                        algorithm_name = "ids"
+
+                    import copy
+                    block_copy = copy.deepcopy(self.block)
+                    board.copy = copy.deepcopy(self.board)
+
+                    problem = Problem(block_copy, board_copy)
+
+                    if algorithm_name == "a_star":
+                        solution_node = search_algorithms.a_star(problem)
+                    elif algorithm_name == "bfs":
+                        solution_node = search_algorithms.breadth_first_search(problem)
+                    elif algorithm_name == "dfs":
+                        solution_node = search_algorithms.depth_first_search(problem)
+                    elif algorithm_name == "greedy":
+                        solution_node = search_algorithms.greedy_search(problem)
+                    elif algorithm_name == "ucs":
+                        solution_node = search_algorithms.uniform_cost_search(problem)
+                    elif algorithm_name == "ids":
+                        solution_node = search_algorithms.iterative_deepening_search(problem)
+
+                    if solution_node:
+                        self.solution_actions = []
+                        while solution_node.parent is not None:
+                            self.solution_actions.append(solution_node.action)
+                            solution_node = solution_node.parent
+                        self.solution_actions.reverse()
+
+                        self.show_solution = True
+                        self.solution_index = 0
+                        self.show_algorithm_selection = False
+                   else:
+                        print(f"No solution found using {algorithm_name}")
+                        self.show_algorithm_selection = False
 
     def handle_level_complete(self, mouse_pos):
         self.menu_button.update(mouse_pos)
@@ -210,26 +332,15 @@ class Renderer:
 
         self.target_block_position = (temp_block.x1, temp_block.y1, temp_block.x2, temp_block.y2)
 
-    '''
-    def update_animation(self):
-        if not self.animation_active:
-            pygame.display.flip()
-            return
-
-        self.animation_progress += self.animation_speed
-
-        if self.animation_progress >= 1:
-            self.animation_active = False
-            self.block.move(self.animation_direction)
-            self.board.refresh_layout(self.block)
-            self.game_logic.update()
-    '''
-
     def draw(self):
         self.screen.fill(LIGHT_BLUE)
 
         if self.game_state == MAIN_MENU:
             self.draw_main_menu()
+        elif self.game_state == AI_OR_HUMAN:
+            self.draw_ai_or_human()
+        elif self.game_state == ALGORITHMS:
+            self.draw_algorithms()
         elif self.game_state == RULES:
             self.draw_rules_screen()
         elif self.game_state == LEVEL_SELECT:
@@ -254,7 +365,6 @@ class Renderer:
         # Draw buttons
         self.play_button.draw(self.screen)
         self.rules_button.draw(self.screen)
-        self.quit_button.draw(self.screen)
 
     def draw_rules_screen(self):
         # Draw title
@@ -309,6 +419,37 @@ class Renderer:
         # Draw back button
         self.back_button.draw(self.screen)
 
+    def draw_ai_or_human(self):
+        # Draw title
+        font = pygame.font.Font(None, 48)
+        title = font.render("Play as AI or Human?", True, BLUE)
+        title_rect = title.get_rect(center=(SCREEN_WIDTH // 2, 60))
+        self.screen.blit(title, title_rect)
+
+        # Draw buttons
+        self.human_button.draw(self.screen)
+        self.ai_button.draw(self.screen)
+        self.back_button.draw(self.screen)
+
+    def draw_algorithms(self):
+        # Draw title
+        font = pygame.font.Font(None, 48)
+        title = font.render("Choose the search algorithm", True, BLUE)
+        title_rect = title.get_rect(center=(SCREEN_WIDTH // 2, 60))
+        self.screen.blit(title, title_rect)
+
+        # Draw buttons
+        for button in self.algorithm_buttons:
+            button.draw(self.screen)
+
+    def draw_solve_options(self):
+        if hasattr(self, 'show_solution') and self.show_solution:
+            font = pygame.font.Font(None, 24)
+            text = font.render(f"Solving... Step {self.solution_index}/{len(self.solution_actions)}", True, BLACK)
+            self.screen.blit(text, (20, 150))
+
+        self.solve_button.draw(self.screen)
+
     def draw_level(self):
         # Draw the game grid
         layout = self.board.level.layout
@@ -337,21 +478,6 @@ class Renderer:
                         pygame.draw.rect(self.screen, HOT_PINK, (x, y, TILE_SIZE, TILE_SIZE))
                         pygame.draw.rect(self.screen, BLACK, (x, y, TILE_SIZE, TILE_SIZE), 1)
 
-                '''
-                elif tile_type == -2:  # Hidden path
-                    print("here")
-                    if self.board.button_is_active:
-                        pygame.draw.rect(self.screen, BLUE, (x, y, TILE_SIZE, TILE_SIZE))
-                    else:
-                        pygame.draw.rect(self.screen, BLACK, (x, y, TILE_SIZE, TILE_SIZE))
-                        pygame.draw.rect(self.screen, BLACK, (x, y, TILE_SIZE, TILE_SIZE), 1)
-                '''
-
-        # Draw the block
-        #if self.animation_active:
-            #self.draw_animated_block()
-        #else:
-            #self.draw_block()
 
         # Draw UI elements
         self.menu_button.draw(self.screen)
@@ -359,68 +485,11 @@ class Renderer:
 
         # Draw level information
         font = pygame.font.Font(None, 32)
-        level_text = font.render(f"Level: {self.current_level.replace('LEVEL', '')}", True, BLACK)
+        level_text = font.render(f"Level: {self.current_level.replace('LEVEL', '')}", True, WHITE_CLOUD)
         self.screen.blit(level_text, (20, 20))
 
-        moves_text = font.render(f"Moves: {self.block.move_counter}", True, BLACK)
+        moves_text = font.render(f"Moves: {self.block.move_counter}", True, WHITE_CLOUD)
         self.screen.blit(moves_text, (20, 60))
-
-    #def draw_animated_block(self):
-        #progress = self.animation_progress
-
-        # New interpolated coordinates
-        #x1 = self.old_block_position[0] + (self.target_block_position[0] - self.old_block_position[0]) * progress
-        #x2 = self.old_block_position[1] + (self.target_block_position[1] - self.old_block_position[1]) * progress
-        #y1 = self.old_block_position[2] + (self.target_block_position[2] - self.old_block_position[2]) * progress
-        #y2 = self.old_block_position[3] + (self.target_block_position[3] - self.old_block_position[3]) * progress
-        #block_x1 = x1 * TILE_SIZE + self.camera_offset_x
-        #block_y1 = y1 * TILE_SIZE + self.camera_offset_y
-        #block_x2 = x2 * TILE_SIZE + self.camera_offset_x
-        #block_y2 = y2 * TILE_SIZE + self.camera_offset_y
-
-        #if self.block.orientation == "upright":
-            #pygame.draw.rect(self.screen, HOT_PINK, (block_x1, block_y1, TILE_SIZE, TILE_SIZE))
-            #pygame.draw.rect(self.screen, BLACK, (block_x1, block_y1, TILE_SIZE, TILE_SIZE), 2)
-        #else:
-            #pygame.draw.rect(self.screen, HOT_PINK, (block_x1, block_y1, TILE_SIZE, TILE_SIZE))
-            #pygame.draw.rect(self.screen, HOT_PINK, (block_x2, block_y2, TILE_SIZE, TILE_SIZE))
-
-        # Draw connection
-        #if self.block.orientation == "horizontal":
-            #connection_width = abs(block_x2 - block_x1) + TILE_SIZE
-            #pygame.draw.rect(self.screen, HOT_PINK, (min(block_x1, block_x2), block_y1, connection_width, TILE_SIZE))
-        #else:  # vertical
-            #connection_height = abs(block_y2 - block_y1) + TILE_SIZE
-            #pygame.draw.rect(self.screen, HOT_PINK, (block_x1, min(block_y1, block_y2), TILE_SIZE, connection_height))
-
-        #pygame.draw.rect(self.screen, BLACK, (block_x1, block_y1, TILE_SIZE, TILE_SIZE), 2)
-        #pygame.draw.rect(self.screen, BLACK, (block_x2, block_y2, TILE_SIZE, TILE_SIZE), 2)
-
-    #def draw_block(self):
-        #rect_block_x1 = self.block.x1 * TILE_SIZE + self.camera_offset_x
-        #rect_block_y1 = self.block.y1 * TILE_SIZE + self.camera_offset_y
-        #rect_block_x2 = self.block.x2 * TILE_SIZE + self.camera_offset_x
-        #rect_block_y2 = self.block.y2 * TILE_SIZE + self.camera_offset_y
-
-        #if self.block.orientation != "upright":
-            #pygame.draw.rect(self.screen, HOT_PINK, (rect_block_y1, rect_block_x1, TILE_SIZE, TILE_SIZE))
-            #pygame.draw.rect(self.screen, HOT_PINK, (rect_block_y1, rect_block_x2, TILE_SIZE, TILE_SIZE))
-
-            # Draw connection between blocks
-            #if self.block.orientation == "horizontal":
-                #connection_width = abs(rect_block_x2 - rect_block_x1) + TILE_SIZE
-                #pygame.draw.rect(self.screen, HOT_PINK, (rect_block_y1, min(rect_block_x1, rect_block_x2), connection_width, TILE_SIZE))
-            #else:  # vertical
-                #connection_height = abs(rect_block_y2 - rect_block_y1) + TILE_SIZE
-                #pygame.draw.rect(self.screen, HOT_PINK, (min(rect_block_y1, rect_block_y2), rect_block_x1, TILE_SIZE, connection_height))
-
-            # Borders
-            #pygame.draw.rect(self.screen, BLACK, (rect_block_y1, rect_block_x1, TILE_SIZE, TILE_SIZE), 2)
-            #pygame.draw.rect(self.screen, BLACK, (rect_block_y2, rect_block_x2, TILE_SIZE, TILE_SIZE), 2)
-        #else:
-            # Just upright block
-            #pygame.draw.rect(self.screen, HOT_PINK, (rect_block_y1, rect_block_x1, TILE_SIZE, TILE_SIZE))
-            #pygame.draw.rect(self.screen, BLACK, (rect_block_y2, rect_block_x2, TILE_SIZE, TILE_SIZE), 2)
 
     def draw_game_over(self):
         # Semi-transparent overlay
