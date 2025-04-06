@@ -108,7 +108,7 @@ class Renderer:
         self.algorithm_buttons = []
         algorithms = ["A*", "BFS", "DFS", "Greedy", "UCS", "IDS"]
         for i, algo in enumerate(algorithms):
-            self.algorithm_buttons.append(Button(130, 100 + i*50, 100, 40, algo, CYAN, (100, 255, 255)))
+            self.algorithm_buttons.append(Button(SCREEN_WIDTH // 2 - 70, 100 + i*50, 100, 40, algo, CYAN, (100, 255, 255)))
 
         # Level select buttons
         self.level_buttons = []
