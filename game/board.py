@@ -6,7 +6,6 @@ from .levels import Levels, levels
 class Board:
     def __init__(self, level_name):
         self.level = Levels(level_name)
-        self.button_is_active = 0
 
     def __str__(self):
         pprint(self.level.layout)
@@ -28,34 +27,55 @@ class Board:
         return self.level.is_goal(position)
 
     def is_fatal(self, block):
-        position = ((block.x1, block.y1), (block.x2, block.y2))
+        pos1, pos2 = (block.x1, block.y1), (block.x2, block.y2)
+        position = (pos1, pos2)
         tiles_list = list(map(self.level.get_tiletype, position))
         if "VOID" in tiles_list:
             return True
-        elif "HIDDEN_PATH" in tiles_list and not self.button_is_active:
-            return True
+        elif "HIDDEN_PATH" in tiles_list:
+            if "HIDDEN_PATH" == tiles_list[0]:
+                butt_pos = pos1
+            else:
+                butt_pos = pos2
+
+            for button in self.level.button.keys():
+                if butt_pos in self.level.button[button][1]:
+                    if self.level.button[button][0]:
+                        return False
+                    else:
+                        return True
         elif block.orientation == "upright" and tiles_list.count("GLASS_FLOOR") == 2:
             return True
         return False
 
     def refresh_layout(self, block):
         self.level.layout = deepcopy(levels[self.level.level_name]["layout"])
-        position = ((block.x1, block.y1), (block.x2, block.y2))
+        pos1, pos2 = (block.x1, block.y1), (block.x2, block.y2)
+        position = (pos1, pos2)
         tiles_list = list(map(self.level.get_tiletype, position))
 
-        if tiles_list.count("BUTTON") == 2:
-            self.button_is_active = not self.button_is_active
+        if self.level.button:
+            if tiles_list.count("BUTTON_TYPE_X") == 2:
+                self.level.button[pos1][0] = not self.level.button[pos1][0]
+            elif tiles_list.count("BUTTON_TYPE_HEX") >= 1:
+                try:
+                    self.level.button[pos1][0] = not self.level.button[pos1][0]
+                except KeyError:
+                    self.level.button[pos2][0] = not self.level.button[pos2][0]
+            elif tiles_list.count("BUTTON_ONE_TIME_USE") >= 1:
+                try:
+                    self.level.button[pos1][0] = False
+                except KeyError:
+                    self.level.button[pos2][0] = False
 
-        if self.level.hidden_path:
-            if self.button_is_active:
-                for x, y in self.level.hidden_path:
-                    self.level.layout[x][y] = 0
-            else:
-                for x, y in self.level.hidden_path:
-                    '''
-                    Mudar para -1 ("VOID")
-                    '''
-                    self.level.layout[x][y] = 5
+            for button in self.level.button.keys():
+                for hidden_path_coordinate in self.level.button[button][1]:
+                    x, y = hidden_path_coordinate
+                    print(hidden_path_coordinate)
+                    if self.level.button[button][0]:
+                        self.level.layout[x][y] = 0
+                    else:
+                        self.level.layout[x][y] = -1
 
         if block.orientation == "upright":
             self.level.layout[block.x1][block.y1] = 1

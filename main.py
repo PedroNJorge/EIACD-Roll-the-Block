@@ -19,8 +19,6 @@ from search_algorithms import uniform_cost_search
 
 
 def main():
-    run = True
-
     pygame.init()
 
     board = Board("LEVEL1")
@@ -31,7 +29,6 @@ def main():
     input_handler.renderer = renderer
 
     board.refresh_layout(block)
-    pprint(board.level.layout)
 
     renderer.run()
     pygame.quit()
