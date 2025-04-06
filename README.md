@@ -43,7 +43,8 @@ por imagens do jogo em si
      * *X Type*: Require the block to be standing upright to activate
      * *Hexagonal Type*: Can be activated by the block in any orientation
      * *One-Time-Use Type*: Have the same visual cue as the X Type, but only function one time
-por imagens do jogo em si
+![image](https://github.com/user-attachments/assets/ad7eb970-85e1-406e-964f-faf047367088)
+
 3. **Movement**:
    - The block always rolls over an edge
    - Each move changes the block's orientation
