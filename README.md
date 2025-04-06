@@ -74,6 +74,6 @@ conda create -f environment.yml
 4. View solution statistics and replay solutions
 
 ## Acknowledgments
-Inspired by the original Bloxorz game by Damien Clarke. This project was created for educational purposes to explore search algorithms in game AI.
+Inspired by the original Bloxorz game by Damien Clarke, released on August 22, 2007. This project was created for educational purposes to explore search algorithms in game AI.
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
