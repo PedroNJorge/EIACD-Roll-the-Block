@@ -3,6 +3,29 @@
 ## Introduction
 This project recreates the classic Bloxorz puzzle game (without the teleport feature) and implements various search algorithms to automatically solve each level, i.e. **Breath-First Search**, **Depth-First Search**, **Iterative Deepening Search**, **Uniform-Cost Search**, for the uninformed search algorithms, and, **Greedy Search**, **A\* Search**, for the informed search algorithms. Bloxorz is a 3D block-rolling puzzle game where players navigate a rectangular block through challenging terrain to reach a goal hole.
 
+## Project Structure
+
+```
+.
+├── environment.yml                # Conda environment configuration
+├── game/                          # Core game implementation
+│   ├── block.py 
+│   ├── block.py                   # Block physics and state management
+│   ├── board.py                   # Game board
+│   ├── game_logic.py              # Main game rules and state transitions
+│   ├── input_handler.py           # User input processing
+│   ├── levels.py                  # Level definitions and parsing
+│   └── renderer.py                # Visualization and graphics
+├── search_algorithms/             # AI solvers
+│   ├── a_star.py                  # A* search implementation
+│   ├── best_first_search.py       # Best-first search implementation
+│   ├── bfs.py                     # Breadth-first search
+│   └── dfs.py                     # Depth-first search
+├── main.py                        # Entry point
+├── LICENSE                        # MIT License
+└── README.md                      # This documentation
+```
+
 ## Game Rules
 The game features a 2x1x1 rectangular block that can move in four direction: **up**, **down**, **right**, **left**.
 1. **Block States**:
