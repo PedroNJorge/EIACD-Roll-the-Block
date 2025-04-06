@@ -11,6 +11,7 @@ LEVEL_COMPLETE = 5
 AI_OR_HUMAN = 6
 ALGORITHMS_LEVEL_SELECT = 7
 ALGORITHMS = 8
+AI_PLAYING = 9
 
 
 class InputHandler:
@@ -34,15 +35,22 @@ class InputHandler:
         return True
 
     def handle_keyboard(self, event):
-        match event.key:
-            case pygame.K_w:
-                self.block.move("up")
-            case pygame.K_s:
-                self.block.move("down")
-            case pygame.K_a:
-                self.block.move("left")
-            case pygame.K_d:
-                self.block.move("right")
+        if self.renderer.game_state != AI_PLAYING:
+            match event.key:
+                case pygame.K_w | pygame.K_UP:
+                    self.block.move("up")
+                case pygame.K_s | pygame.K_DOWN:
+                    self.block.move("down")
+                case pygame.K_a | pygame.K_LEFT:
+                    self.block.move("left")
+                case pygame.K_d | pygame.K_RIGHT:
+                    self.block.move("right")
+        else:
+            if self.renderer.solution:
+                print(self.renderer.solution)
+                self.block.move(self.renderer.solution.popleft())
+            else:
+                self.renderer.game_state = LEVEL_COMPLETE
 
         self.board.refresh_layout(self.block)
         self.game_logic.update()
@@ -58,7 +66,7 @@ class InputHandler:
                     self.renderer.handle_rules_screen(mouse_pos)
                 case 2 | 7:
                     self.renderer.handle_level_select(mouse_pos)
-                case 3:
+                case 3 | 9:
                     self.renderer.handle_playing(mouse_pos)
                 case 4:
                     self.renderer.handle_game_over(mouse_pos)

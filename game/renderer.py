@@ -1,14 +1,20 @@
+from collections import deque
+import matplotlib.pyplot as plt
+from memory_profiler import memory_usage
 import pygame
+from pprint import pprint
+import time
 from game.block import Block
 from game.board import Board
 from game.game_logic import GameLogic
 from game.input_handler import InputHandler
-import search_algorithms
-from search_algorithms import (
-        a_star, breadth_first_search, depth_first_search,
-        greedy_search, uniform_cost_search, iterative_deepening_search,
-        Problem
-    )
+from search_algorithms import Problem
+from search_algorithms import a_star
+from search_algorithms import breadth_first_search
+from search_algorithms import depth_first_search
+from search_algorithms import greedy_search
+from search_algorithms import iterative_deepening_search
+from search_algorithms import uniform_cost_search
 
 # Constants
 SCREEN_WIDTH = 800
@@ -42,6 +48,7 @@ LEVEL_COMPLETE = 5
 AI_OR_HUMAN = 6
 ALGORITHMS_LEVEL_SELECT = 7
 ALGORITHMS = 8
+AI_PLAYING = 9
 
 
 # All buttons shape and color
@@ -84,6 +91,10 @@ class Renderer:
         self.input_handler = input_handler
         self.init_buttons()
         self.running = True
+        self.algorithm = None
+        self.solution = None
+        self.algorithm_completed = False
+        self.level_name = None
 
         self.animation_active = False
         self.animation_direction = None
@@ -139,6 +150,56 @@ class Renderer:
 
         self.calculate_camera_offset()
 
+        if AI and not self.algorithm_completed:
+            if self.board.level.button:
+                layout_only = False
+            else:
+                layout_only = True
+            problem = Problem(self.block, self.board, layout_only=layout_only)
+
+            match self.algorithm:
+                case "a*":
+                    start = time.perf_counter()
+                    # solution_node = a_star(problem)
+                    mem_usage, solution = memory_usage((a_star, (problem,)), retval=True)
+                    end = time.perf_counter()
+                case "bfs":
+                    solution_node = breadth_first_search(problem)
+                case "dfs":
+                    solution_node = depth_first_search(problem)
+                case "greedy":
+                    solution_node = greedy_search(problem)
+                case "ucs":
+                    solution_node = uniform_cost_search(problem)
+                case "ids":
+                    solution_node = iterative_deepening_search(problem)
+
+            # Plotting
+            plt.plot(mem_usage)
+            plt.ylabel('Memory (MiB)')
+            plt.xlabel('Time')
+            plt.title(f'Memory usage for {self.algorithm}')
+            plt.show()
+
+            print(f"Algorithm took {(end - start)*1000:.6f} ms")
+
+            if solution_node is not None:
+                print("---------------------FINISHED-----------------------------")
+                pprint(solution_node.state)
+
+                self.solution = deque()
+                prev_node = solution_node.parent
+                self.solution.appendleft(solution_node.action)
+
+                while prev_node is not None:
+                    self.solution.appendleft(prev_node.action)
+                    prev_node = prev_node.parent
+
+                self.solution.popleft()
+                print(self.solution)
+                print(f"Moves made: {len(self.solution)}")
+                self.algorithm_completed = True
+
     def calculate_camera_offset(self):
         level_pixel_width = len(self.board.level.layout[0]) * TILE_SIZE
         level_pixel_height = len(self.board.level.layout) * TILE_SIZE
@@ -156,9 +217,9 @@ class Renderer:
             self.draw_algorithms()
         elif self.game_state == RULES:
             self.draw_rules_screen()
-        elif self.game_state == LEVEL_SELECT:
+        elif self.game_state == LEVEL_SELECT or self.game_state == ALGORITHMS_LEVEL_SELECT:
             self.draw_level_select()
-        elif self.game_state == PLAYING:
+        elif self.game_state == PLAYING or self.game_state == AI_PLAYING:
             self.draw_level()
         elif self.game_state == GAME_OVER:
             self.draw_level()
@@ -217,21 +278,11 @@ class Renderer:
             self.game_state = AI_OR_HUMAN
         for button in self.algorithm_buttons:
             for i, button in enumerate(self.algorithm_buttons):
-            button.update(mouse_pos)
-            if button.is_clicked(mouse_pos):
-                algorithm_name = button.text.lower()
-                if algorithm_name == "a*":
-                    algorithm_name = "a_star"
-                elif algorithm_name == "bfs":
-                    algorithm_name = "bfs"
-                elif algorithm_name == "dfs":
-                    algorithm_name = "dfs"
-                elif algorithm_name == "greedy":
-                    algorithm_name = "greedy"
-                elif algorithm_name == "ucs":
-                    algorithm_name = "ucs"
-                elif algorithm_name == "ids":
-                    algorithm_name = "ids"
+                button.update(mouse_pos)
+                if button.is_clicked(mouse_pos):
+                    self.algorithm = button.text.lower()
+                    self.initialize_level(self.level_name, AI=True)
+                    self.game_state = AI_PLAYING
 
     def handle_level_select(self, mouse_pos):
         self.back_button.update(mouse_pos)
@@ -242,12 +293,12 @@ class Renderer:
         for i, button in enumerate(self.level_buttons):
             button.update(mouse_pos)
             if button.is_clicked(mouse_pos):
-                level_name = f"LEVEL{i+1}"
+                self.level_name = f"LEVEL{i+1}"
                 if self.game_state == ALGORITHMS_LEVEL_SELECT:
-                    self.initialize_level(level_name, AI=True)
+                    self.game_state = ALGORITHMS
                 else:
-                    self.initialize_level(level_name)
-                self.game_state = PLAYING
+                    self.initialize_level(self.level_name)
+                    self.game_state = PLAYING
 
     def handle_game_over(self, mouse_pos):
         self.restart_button.update(mouse_pos)
@@ -407,10 +458,9 @@ class Renderer:
                     case 7:  # Goal
                         pygame.draw.rect(self.screen, GREEN, (x, y, TILE_SIZE, TILE_SIZE))
                         pygame.draw.rect(self.screen, BLACK, (x, y, TILE_SIZE, TILE_SIZE), 1)
-                    case 2 | 1: #Block
+                    case 2 | 1:  # Block
                         pygame.draw.rect(self.screen, HOT_PINK, (x, y, TILE_SIZE, TILE_SIZE))
                         pygame.draw.rect(self.screen, BLACK, (x, y, TILE_SIZE, TILE_SIZE), 1)
-
 
         # Draw UI elements
         self.menu_button.draw(self.screen)
@@ -423,6 +473,15 @@ class Renderer:
 
         moves_text = font.render(f"Moves: {self.block.move_counter}", True, WHITE_CLOUD)
         self.screen.blit(moves_text, (20, 60))
+
+        if self.game_state == AI_PLAYING and self.solution:
+            print(self.solution)
+            self.block.move(self.solution.popleft())
+            self.board.refresh_layout(self.block)
+            pygame.time.delay(1000)
+        elif self.solution is not None and not self.solution:
+            pygame.time.delay(1000)
+            self.game_state = LEVEL_COMPLETE
 
     def draw_game_over(self):
         # Semi-transparent overlay

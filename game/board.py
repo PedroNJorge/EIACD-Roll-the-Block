@@ -18,10 +18,15 @@ class Board:
     def __eq__(self, other):
         if not isinstance(other, Board):
             return False
-        return tuple(map(tuple, self.level.layout)) == tuple(map(tuple, other.level.layout)) and self.button_is_active == other.button_is_active
+        return tuple(map(tuple, self.level.layout)) == tuple(map(tuple, other.level.layout))
 
     def __hash__(self):
-        return hash((tuple(map(tuple, self.level.layout)), self.button_is_active))
+        lst = [tuple(map(tuple, self.level.layout))]
+        if self.level.button is not None:
+            for button in self.level.button.keys():
+                lst.append(self.level.button[button][0])
+
+        return hash(tuple(lst))
 
     def is_goal(self, position):
         return self.level.is_goal(position)
@@ -33,17 +38,18 @@ class Board:
         if "VOID" in tiles_list:
             return True
         elif "HIDDEN_PATH" in tiles_list:
+            path_positions = []
+
             if "HIDDEN_PATH" == tiles_list[0]:
-                butt_pos = pos1
-            else:
-                butt_pos = pos2
+                path_positions.append(pos1)
+            if "HIDDEN_PATH" == tiles_list[1]:
+                path_positions.append(pos2)
 
             for button in self.level.button.keys():
-                if butt_pos in self.level.button[button][1]:
-                    if self.level.button[button][0]:
-                        return False
-                    else:
-                        return True
+                for path in path_positions:
+                    if path in self.level.button[button][1]:
+                        if not self.level.button[button][0]:
+                            return True
         elif block.orientation == "upright" and tiles_list.count("GLASS_FLOOR") == 2:
             return True
         return False
