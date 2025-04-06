@@ -9,6 +9,7 @@ Matrix Caption: </br>
 * `3` - Glass Floor
 * `4` - X Type Button
 * `5` - Hexagonal Type Button
+* `6` - One Time Use Type Button
 * `7` - Goal
 
 # Libraries used
