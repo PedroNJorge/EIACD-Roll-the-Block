@@ -1,5 +1,48 @@
 # EIACD-Roll-the-Block
 
+## Introduction
+This project recreates the classic Bloxorz puzzle game (without the teleport feature) and implements various search algorithms to automatically solve each level, i.e. **Breath-First Search**, **Depth-First Search**, **Iterative Deepening Search**, **Uniform-Cost Search**, for the uninformed search algorithms, and, **Greedy Search**, **A\* Search**, for the informed search algorithms. Bloxorz is a 3D block-rolling puzzle game where players navigate a rectangular block through challenging terrain to reach a goal hole.</br></br>
+
+## Game Rules
+The game features a 2x1x1 rectangular block that can move in four direction: **up**, **down**, **right**, **left**.
+1. **Block States**:
+   - **Upright** (2 cubes stacked in the z-axis)
+   - **Horizontal** (2 cubes side by side in the x-axis)
+   - **Vertical** (2 cubes side by side in the y-axis
+
+2. **Level Elements**:
+   - **Void tiles**: The block falls over, ending the game
+   - **Floor tiles**: Can support the block in any orientation
+   - **Glass Floor tiles**: Break if the block stands upright on them (must be crossed lying flat)
+   - **Goal tile**: The hole where the block must end in the upright state to win
+   - **Hidden Path**: Require the block to activate switches to cross
+   - **Buttons**
+   - * *X Type*: Require the block to be standing upright to activate
+     * *Hexagonal Type*: Can be activated by the block in any orientation
+     * *One-Time-Use Type*: Have the same visual cue as the X Type, but only function one time
+
+3. **Movement**:
+   - The block always rolls over an edge (never slides)
+   - Each move changes the block's orientation
+   - From standing position, any roll makes the block lay flat
+   - From flat position, rolling "forward" makes it stand up, while rolling "sideways" keeps it flat
+
+3. **Level Elements**:
+   - **Normal tiles**: Can support the block in any orientation
+   - **Weak tiles**: Break if the block stands upright on them (must be crossed lying flat)
+   - **Goal tile**: The hole where the block must end standing upright to win
+   - **Bridges**: Require the block to activate switches to cross
+   - **Walls**: Block movement in certain directions
+
+4. **Losing Conditions**:
+   - Block falls off the map
+   - Block stands upright on a weak tileThe key rules are:The block itself has 3 different states:
+* **Upright**
+* **Horizontal**
+* **Vertical**
+por imagens do jogo em si
+
+
 Matrix Caption: </br>
 * `-2` - Hidden Path
 * `-1` - Void
