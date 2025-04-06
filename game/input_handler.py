@@ -9,7 +9,8 @@ PLAYING = 3
 GAME_OVER = 4
 LEVEL_COMPLETE = 5
 AI_OR_HUMAN = 6
-ALGORITHMS = 7
+ALGORITHMS_LEVEL_SELECT = 7
+ALGORITHMS = 8
 
 
 class InputHandler:
@@ -55,7 +56,7 @@ class InputHandler:
                     self.renderer.handle_main_menu(mouse_pos)
                 case 1:
                     self.renderer.handle_rules_screen(mouse_pos)
-                case 2:
+                case 2 | 7:
                     self.renderer.handle_level_select(mouse_pos)
                 case 3:
                     self.renderer.handle_playing(mouse_pos)
@@ -65,5 +66,5 @@ class InputHandler:
                     self.renderer.handle_level_complete(mouse_pos)
                 case 6:
                     self.renderer.handle_ai_or_human(mouse_pos)
-                case 7:
+                case 8:
                     self.renderer.handle_algorithms(mouse_pos)

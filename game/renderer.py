@@ -40,7 +40,8 @@ PLAYING = 3
 GAME_OVER = 4
 LEVEL_COMPLETE = 5
 AI_OR_HUMAN = 6
-ALGORITHMS = 7
+ALGORITHMS_LEVEL_SELECT = 7
+ALGORITHMS = 8
 
 
 # All buttons shape and color
@@ -103,7 +104,7 @@ class Renderer:
         # Back from rules
         self.back_button = Button(center_x - 100, 500, 200, 50, "Back", WHITE_CLOUD, (204, 255, 204))
 
-        #Search algorithms
+        # Search algorithms
         self.solve_button = Button(20, 100, 100, 40, "Solve", WHITE_CLOUD, (204, 255, 204))
         self.algorithm_buttons = []
         algorithms = ["A*", "BFS", "DFS", "Greedy", "UCS", "IDS"]
@@ -125,7 +126,7 @@ class Renderer:
         self.next_level_button = Button(SCREEN_WIDTH // 2 - 100, 400, 200, 50, "Next Level", BLUE, (51, 51, 255))
         self.retry_button = Button(SCREEN_WIDTH // 2 - 100, SCREEN_HEIGHT // 2 + 50, 200, 50, "Try Again", YELLOW, (225, 255, 100))
 
-    def initialize_level(self, level_name):
+    def initialize_level(self, level_name, AI=False):
         self.current_level = level_name
         self.board = Board(level_name)
         x, y = self.board.level.start
@@ -144,6 +145,31 @@ class Renderer:
         self.camera_offset_x = (SCREEN_WIDTH - level_pixel_width) // 2
         self.camera_offset_y = (SCREEN_HEIGHT - level_pixel_height) // 2
 
+    def draw(self):
+        self.screen.fill(LIGHT_BLUE)
+
+        if self.game_state == MAIN_MENU:
+            self.draw_main_menu()
+        elif self.game_state == AI_OR_HUMAN:
+            self.draw_ai_or_human()
+        elif self.game_state == ALGORITHMS:
+            self.draw_algorithms()
+        elif self.game_state == RULES:
+            self.draw_rules_screen()
+        elif self.game_state == LEVEL_SELECT:
+            self.draw_level_select()
+        elif self.game_state == PLAYING:
+            self.draw_level()
+        elif self.game_state == GAME_OVER:
+            self.draw_level()
+            self.draw_game_over()
+        elif self.game_state == LEVEL_COMPLETE:
+            self.draw_level()
+            self.draw_level_complete()
+
+        pygame.display.flip()
+
+    # GAME STATE 0 - MAIN_MENU
     def handle_main_menu(self, mouse_pos):
         self.play_button.update(mouse_pos)
         self.rules_button.update(mouse_pos)
@@ -153,6 +179,17 @@ class Renderer:
         elif self.rules_button.is_clicked(mouse_pos):
             self.game_state = RULES
 
+    def draw_main_menu(self):
+        # Draw title
+        font = pygame.font.Font(None, 72)
+        title = font.render("Roll the Block", True, BLUE)
+        title_rect = title.get_rect(center=(SCREEN_WIDTH // 2, 100))
+        self.screen.blit(title, title_rect)
+        # Draw buttons
+        self.play_button.draw(self.screen)
+        self.rules_button.draw(self.screen)
+
+    # GAME_STATE 1 - RULES
     def handle_rules_screen(self, mouse_pos):
         self.back_button.update(mouse_pos)
 
@@ -169,7 +206,7 @@ class Renderer:
         elif self.human_button.is_clicked(mouse_pos):
             self.game_state = LEVEL_SELECT
         elif self.ai_button.is_clicked(mouse_pos):
-            self.game_state = ALGORITHMS
+            self.game_state = ALGORITHMS_LEVEL_SELECT
 
     def handle_algorithms(self, mouse_pos):
         self.back_button.update(mouse_pos)
@@ -180,8 +217,8 @@ class Renderer:
             self.game_state = AI_OR_HUMAN
         for button in self.algorithm_buttons:
             if button.is_clicked:
-                self.game_state = LEVEL_SELECT
-                    
+                self.game_state = PLAYING
+
     def handle_level_select(self, mouse_pos):
         self.back_button.update(mouse_pos)
 
@@ -192,7 +229,10 @@ class Renderer:
             button.update(mouse_pos)
             if button.is_clicked(mouse_pos):
                 level_name = f"LEVEL{i+1}"
-                self.initialize_level(level_name)
+                if self.game_state == ALGORITHMS_LEVEL_SELECT:
+                    self.initialize_level(level_name, AI=True)
+                else:
+                    self.initialize_level(level_name)
                 self.game_state = PLAYING
 
     def handle_game_over(self, mouse_pos):
@@ -217,7 +257,7 @@ class Renderer:
 
         if self.game_logic.game_over:
             self.game_state = GAME_OVER
-                
+
     def handle_level_complete(self, mouse_pos):
         self.menu_button.update(mouse_pos)
         self.next_level_button.update(mouse_pos)
@@ -244,40 +284,6 @@ class Renderer:
         temp_block.move(direction)
 
         self.target_block_position = (temp_block.x1, temp_block.y1, temp_block.x2, temp_block.y2)
-
-    def draw(self):
-        self.screen.fill(LIGHT_BLUE)
-
-        if self.game_state == MAIN_MENU:
-            self.draw_main_menu()
-        elif self.game_state == AI_OR_HUMAN:
-            self.draw_ai_or_human()
-        elif self.game_state == ALGORITHMS:
-            self.draw_algorithms()
-        elif self.game_state == RULES:
-            self.draw_rules_screen()
-        elif self.game_state == LEVEL_SELECT:
-            self.draw_level_select()
-        elif self.game_state == PLAYING:
-            self.draw_level()
-        elif self.game_state == GAME_OVER:
-            self.draw_level()
-            self.draw_game_over()
-        elif self.game_state == LEVEL_COMPLETE:
-            self.draw_level()
-            self.draw_level_complete()
-
-        pygame.display.flip()
-
-    def draw_main_menu(self):
-        # Draw title
-        font = pygame.font.Font(None, 72)
-        title = font.render("Roll the Block", True, BLUE)
-        title_rect = title.get_rect(center=(SCREEN_WIDTH // 2, 100))
-        self.screen.blit(title, title_rect)
-        # Draw buttons
-        self.play_button.draw(self.screen)
-        self.rules_button.draw(self.screen)
 
     def draw_rules_screen(self):
         # Draw title
