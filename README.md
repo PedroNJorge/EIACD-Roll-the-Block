@@ -9,7 +9,7 @@ This project recreates the classic Bloxorz puzzle game (without the teleport fea
 .
 ├── environment.yml                # Conda environment configuration
 ├── game/                          # Core game implementation
-│   ├── block.py 
+│   ├── __init__.py                # Makes 'game' a package
 │   ├── block.py                   # Block physics and state management
 │   ├── board.py                   # Game board
 │   ├── game_logic.py              # Main game rules and state transitions
