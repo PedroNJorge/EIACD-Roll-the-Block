@@ -109,9 +109,6 @@ class Renderer:
         algorithms = ["A*", "BFS", "DFS", "Greedy", "UCS", "IDS"]
         for i, algo in enumerate(algorithms):
             self.algorithm_buttons.append(Button(130, 100 + i*50, 100, 40, algo, CYAN, (100, 255, 255)))
-        self.show_solution = False
-        self.solution_actions = []
-        self.solution_index = 0
 
         # Level select buttons
         self.level_buttons = []
@@ -184,33 +181,7 @@ class Renderer:
         for button in self.algorithm_buttons:
             if button.is_clicked:
                 self.game_state = LEVEL_SELECT
-
-    def solving_algorithm(board, block, algorithm_name):
-        problem = Problem(block, board)
-
-        if algorithm_name == "a_star":
-            solution_node = a_star(problem)
-        elif algorithm_name == "bfs":
-            solution_node = breadth_first_search(problem)
-        elif algorithm_name == "dfs":
-            solution_node = depth_first_search(problem)
-        elif algorithm_name == "greedy":
-            solution_node = greedy_search(problem)
-        elif algorithm_name == "ucs":
-            solution_node = uniform_cost_search(problem)
-        elif algorithm_name == "ids":
-            solution_node = iterative_deepening_search(problem)
-
-        if solution_node is None:
-            return None
-
-        actions = []
-        while solution_node.parent is not None:
-            actions.append(solution_node.action)
-            solution_node = solution_node.parent
-
-        return actions [::-1]
-
+                    
     def handle_level_select(self, mouse_pos):
         self.back_button.update(mouse_pos)
 
@@ -246,65 +217,7 @@ class Renderer:
 
         if self.game_logic.game_over:
             self.game_state = GAME_OVER
-        elif self.game_logic.level_completed:
-            self.game_state = LEVEL_COMPLETE
-
-        # Handle solve button
-        self.solve_button.update(mouse_pos)
-        if self.solve_button.is_clicked(mouse_pos):
-            self.show_algorithm_selection = True
-
-        if hasattr(self, 'show_algorithm_selection') and self.show_algorithm_selection:
-            for i, button in enumerate(self.algorithm_buttons):
-                button.update(mouse_pos)
-                if button.is_clicked(mouse_pos):
-                    algorithm_name = button.text.lower()
-                    if algorithm_name == "a*":
-                        algorithm_name = "a_star"
-                    elif algorithm_name == "bfs":
-                        algorithm_name = "bfs"
-                    elif algorithm_name == "dfs":
-                        algorithm_name = "dfs"
-                    elif algorithm_name == "greedy":
-                        algorithm_name = "greedy"
-                    elif algorithm_name == "ucs":
-                        algorithm_name = "ucs"
-                    elif algorithm_name == "ids":
-                        algorithm_name = "ids"
-
-                    import copy
-                    block_copy = copy.deepcopy(self.block)
-                    board.copy = copy.deepcopy(self.board)
-
-                    problem = Problem(block_copy, board_copy)
-
-                    if algorithm_name == "a_star":
-                        solution_node = search_algorithms.a_star(problem)
-                    elif algorithm_name == "bfs":
-                        solution_node = search_algorithms.breadth_first_search(problem)
-                    elif algorithm_name == "dfs":
-                        solution_node = search_algorithms.depth_first_search(problem)
-                    elif algorithm_name == "greedy":
-                        solution_node = search_algorithms.greedy_search(problem)
-                    elif algorithm_name == "ucs":
-                        solution_node = search_algorithms.uniform_cost_search(problem)
-                    elif algorithm_name == "ids":
-                        solution_node = search_algorithms.iterative_deepening_search(problem)
-
-                    if solution_node:
-                        self.solution_actions = []
-                        while solution_node.parent is not None:
-                            self.solution_actions.append(solution_node.action)
-                            solution_node = solution_node.parent
-                        self.solution_actions.reverse()
-
-                        self.show_solution = True
-                        self.solution_index = 0
-                        self.show_algorithm_selection = False
-                   else:
-                        print(f"No solution found using {algorithm_name}")
-                        self.show_algorithm_selection = False
-
+                
     def handle_level_complete(self, mouse_pos):
         self.menu_button.update(mouse_pos)
         self.next_level_button.update(mouse_pos)
