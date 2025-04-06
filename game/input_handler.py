@@ -61,3 +61,7 @@ class InputHandler:
                     self.renderer.handle_game_over(mouse_pos)
                 case 5:
                     self.renderer.handle_level_complete(mouse_pos)
+                case 6:
+                    self.renderer.handle_ai_or_human(mouse_pos)
+                case 7:
+                    self.renderer.handle_algorithms(mouse_pos)
