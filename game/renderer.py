@@ -105,6 +105,8 @@ class Renderer:
         # Game buttons
         self.menu_button = Button(SCREEN_WIDTH - 120, 20, 100, 40, "Menu", WHITE_CLOUD, (204, 255, 204))
         self.restart_button = Button(SCREEN_WIDTH - 120, 70, 100, 40, "Restart", WHITE_CLOUD, (204, 255, 204))
+        self.next_level_button = Button(SCREEN_WIDTH // 2 - 100, 400, 200, 50, "Next Level", BLUE, (51, 51, 255))
+        self.retry_button = Button(SCREEN_WIDTH // 2 - 100, SCREEN_HEIGHT // 2 + 50, 200, 50, "Try Again", YELLOW, (225, 255, 100))
 
     def initialize_level(self, level_name):
         self.current_level = level_name
@@ -173,8 +175,9 @@ class Renderer:
     def handle_game_over(self, mouse_pos):
         self.restart_button.update(mouse_pos)
         self.menu_button.update(mouse_pos)
+        self.retry_button.update(mouse_pos)
 
-        if self.restart_button.is_clicked(mouse_pos):
+        if self.restart_button.is_clicked(mouse_pos) or self.retry_button.is_clicked(mouse_pos):
             self.initialize_level(self.current_level)
             self.game_state = PLAYING
         elif self.menu_button.is_clicked(mouse_pos):
@@ -182,11 +185,9 @@ class Renderer:
 
     def handle_level_complete(self, mouse_pos):
         self.menu_button.update(mouse_pos)
+        self.next_level_button.update(mouse_pos)
 
-        next_level_button = Button(SCREEN_WIDTH // 2 - 100, 300, 200, 50, "Next Level", BLUE, (51, 51, 255))
-        next_level_button.update(mouse_pos)
-
-        if next_level_button.is_clicked(mouse_pos):
+        if self.next_level_button.is_clicked(mouse_pos):
             self.board.switch_level()
             next_level = self.board.level.level_name
             self.initialize_level(next_level)
@@ -332,6 +333,10 @@ class Renderer:
                     case 7:  # Goal
                         pygame.draw.rect(self.screen, GREEN, (x, y, TILE_SIZE, TILE_SIZE))
                         pygame.draw.rect(self.screen, BLACK, (x, y, TILE_SIZE, TILE_SIZE), 1)
+                    case 2 | 1: #Block
+                        pygame.draw.rect(self.screen, HOT_PINK, (x, y, TILE_SIZE, TILE_SIZE))
+                        pygame.draw.rect(self.screen, BLACK, (x, y, TILE_SIZE, TILE_SIZE), 1)
+
                 '''
                 elif tile_type == -2:  # Hidden path
                     print("here")
@@ -343,10 +348,10 @@ class Renderer:
                 '''
 
         # Draw the block
-        if self.animation_active:
-            self.draw_animated_block()
-        else:
-            self.draw_block()
+        #if self.animation_active:
+            #self.draw_animated_block()
+        #else:
+            #self.draw_block()
 
         # Draw UI elements
         self.menu_button.draw(self.screen)
@@ -360,62 +365,62 @@ class Renderer:
         moves_text = font.render(f"Moves: {self.block.move_counter}", True, BLACK)
         self.screen.blit(moves_text, (20, 60))
 
-    def draw_animated_block(self):
-        progress = self.animation_progress
+    #def draw_animated_block(self):
+        #progress = self.animation_progress
 
         # New interpolated coordinates
-        x1 = self.old_block_position[0] + (self.target_block_position[0] - self.old_block_position[0]) * progress
-        x2 = self.old_block_position[1] + (self.target_block_position[1] - self.old_block_position[1]) * progress
-        y1 = self.old_block_position[2] + (self.target_block_position[2] - self.old_block_position[2]) * progress
-        y2 = self.old_block_position[3] + (self.target_block_position[3] - self.old_block_position[3]) * progress
-        block_x1 = y1 * TILE_SIZE + self.camera_offset_x
-        block_y1 = x1 * TILE_SIZE + self.camera_offset_y
-        block_x2 = y2 * TILE_SIZE + self.camera_offset_x
-        block_y2 = x2 * TILE_SIZE + self.camera_offset_y
+        #x1 = self.old_block_position[0] + (self.target_block_position[0] - self.old_block_position[0]) * progress
+        #x2 = self.old_block_position[1] + (self.target_block_position[1] - self.old_block_position[1]) * progress
+        #y1 = self.old_block_position[2] + (self.target_block_position[2] - self.old_block_position[2]) * progress
+        #y2 = self.old_block_position[3] + (self.target_block_position[3] - self.old_block_position[3]) * progress
+        #block_x1 = x1 * TILE_SIZE + self.camera_offset_x
+        #block_y1 = y1 * TILE_SIZE + self.camera_offset_y
+        #block_x2 = x2 * TILE_SIZE + self.camera_offset_x
+        #block_y2 = y2 * TILE_SIZE + self.camera_offset_y
 
-        if self.block.orientation == "upright":
-            pygame.draw.rect(self.screen, HOT_PINK, (block_x1, block_y1, TILE_SIZE, TILE_SIZE))
-            pygame.draw.rect(self.screen, BLACK, (block_x1, block_y1, TILE_SIZE, TILE_SIZE), 2)
-        else:
-            pygame.draw.rect(self.screen, HOT_PINK, (block_x1, block_y1, TILE_SIZE, TILE_SIZE))
-            pygame.draw.rect(self.screen, HOT_PINK, (block_x2, block_y2, TILE_SIZE, TILE_SIZE))
+        #if self.block.orientation == "upright":
+            #pygame.draw.rect(self.screen, HOT_PINK, (block_x1, block_y1, TILE_SIZE, TILE_SIZE))
+            #pygame.draw.rect(self.screen, BLACK, (block_x1, block_y1, TILE_SIZE, TILE_SIZE), 2)
+        #else:
+            #pygame.draw.rect(self.screen, HOT_PINK, (block_x1, block_y1, TILE_SIZE, TILE_SIZE))
+            #pygame.draw.rect(self.screen, HOT_PINK, (block_x2, block_y2, TILE_SIZE, TILE_SIZE))
 
         # Draw connection
-        if self.block.orientation == "horizontal":
-            connection_width = abs(block_x2 - block_x1) + TILE_SIZE
-            pygame.draw.rect(self.screen, HOT_PINK, (min(block_x1, block_x2), block_y1, connection_width, TILE_SIZE))
-        else:  # vertical
-            connection_height = abs(block_y2 - block_y1) + TILE_SIZE
-            pygame.draw.rect(self.screen, HOT_PINK, (block_x1, min(block_y1, block_y2), TILE_SIZE, connection_height))
+        #if self.block.orientation == "horizontal":
+            #connection_width = abs(block_x2 - block_x1) + TILE_SIZE
+            #pygame.draw.rect(self.screen, HOT_PINK, (min(block_x1, block_x2), block_y1, connection_width, TILE_SIZE))
+        #else:  # vertical
+            #connection_height = abs(block_y2 - block_y1) + TILE_SIZE
+            #pygame.draw.rect(self.screen, HOT_PINK, (block_x1, min(block_y1, block_y2), TILE_SIZE, connection_height))
 
-        pygame.draw.rect(self.screen, BLACK, (block_x1, block_y1, TILE_SIZE, TILE_SIZE), 2)
-        pygame.draw.rect(self.screen, BLACK, (block_x2, block_y2, TILE_SIZE, TILE_SIZE), 2)
+        #pygame.draw.rect(self.screen, BLACK, (block_x1, block_y1, TILE_SIZE, TILE_SIZE), 2)
+        #pygame.draw.rect(self.screen, BLACK, (block_x2, block_y2, TILE_SIZE, TILE_SIZE), 2)
 
-    def draw_block(self):
-        rect_block_x1 = self.block.x1 * TILE_SIZE + self.camera_offset_x
-        rect_block_y1 = self.block.y1 * TILE_SIZE + self.camera_offset_y
-        rect_block_x2 = self.block.x2 * TILE_SIZE + self.camera_offset_x
-        rect_block_y2 = self.block.y2 * TILE_SIZE + self.camera_offset_y
+    #def draw_block(self):
+        #rect_block_x1 = self.block.x1 * TILE_SIZE + self.camera_offset_x
+        #rect_block_y1 = self.block.y1 * TILE_SIZE + self.camera_offset_y
+        #rect_block_x2 = self.block.x2 * TILE_SIZE + self.camera_offset_x
+        #rect_block_y2 = self.block.y2 * TILE_SIZE + self.camera_offset_y
 
-        if self.block.orientation != "upright":
-            pygame.draw.rect(self.screen, HOT_PINK, (rect_block_y1, rect_block_x1, TILE_SIZE, TILE_SIZE))
-            pygame.draw.rect(self.screen, HOT_PINK, (rect_block_y1, rect_block_x2, TILE_SIZE, TILE_SIZE))
+        #if self.block.orientation != "upright":
+            #pygame.draw.rect(self.screen, HOT_PINK, (rect_block_y1, rect_block_x1, TILE_SIZE, TILE_SIZE))
+            #pygame.draw.rect(self.screen, HOT_PINK, (rect_block_y1, rect_block_x2, TILE_SIZE, TILE_SIZE))
 
             # Draw connection between blocks
-            if self.block.orientation == "horizontal":
-                connection_width = abs(rect_block_x2 - rect_block_x1) + TILE_SIZE
-                pygame.draw.rect(self.screen, HOT_PINK, (rect_block_y1, min(rect_block_x1, rect_block_x2), connection_width, TILE_SIZE))
-            else:  # vertical
-                connection_height = abs(rect_block_y2 - rect_block_y1) + TILE_SIZE
-                pygame.draw.rect(self.screen, HOT_PINK, (min(rect_block_y1, rect_block_y2), rect_block_x1, TILE_SIZE, connection_height))
+            #if self.block.orientation == "horizontal":
+                #connection_width = abs(rect_block_x2 - rect_block_x1) + TILE_SIZE
+                #pygame.draw.rect(self.screen, HOT_PINK, (rect_block_y1, min(rect_block_x1, rect_block_x2), connection_width, TILE_SIZE))
+            #else:  # vertical
+                #connection_height = abs(rect_block_y2 - rect_block_y1) + TILE_SIZE
+                #pygame.draw.rect(self.screen, HOT_PINK, (min(rect_block_y1, rect_block_y2), rect_block_x1, TILE_SIZE, connection_height))
 
             # Borders
-            pygame.draw.rect(self.screen, BLACK, (rect_block_y1, rect_block_x1, TILE_SIZE, TILE_SIZE), 2)
-            pygame.draw.rect(self.screen, BLACK, (rect_block_y2, rect_block_x2, TILE_SIZE, TILE_SIZE), 2)
-        else:
+            #pygame.draw.rect(self.screen, BLACK, (rect_block_y1, rect_block_x1, TILE_SIZE, TILE_SIZE), 2)
+            #pygame.draw.rect(self.screen, BLACK, (rect_block_y2, rect_block_x2, TILE_SIZE, TILE_SIZE), 2)
+        #else:
             # Just upright block
-            pygame.draw.rect(self.screen, HOT_PINK, (rect_block_y1, rect_block_x1, TILE_SIZE, TILE_SIZE))
-            pygame.draw.rect(self.screen, BLACK, (rect_block_y2, rect_block_x2, TILE_SIZE, TILE_SIZE), 2)
+            #pygame.draw.rect(self.screen, HOT_PINK, (rect_block_y1, rect_block_x1, TILE_SIZE, TILE_SIZE))
+            #pygame.draw.rect(self.screen, BLACK, (rect_block_y2, rect_block_x2, TILE_SIZE, TILE_SIZE), 2)
 
     def draw_game_over(self):
         # Semi-transparent overlay
@@ -430,8 +435,7 @@ class Renderer:
         self.screen.blit(text, text_rect)
 
         # Buttons
-        retry_button = Button(SCREEN_WIDTH // 2 - 100, SCREEN_HEIGHT // 2 +30, 200, 50, "Try Again", YELLOW, (225, 255, 100))
-        retry_button.draw(self.screen)
+        self.retry_button.draw(self.screen)
 
     def draw_level_complete(self):
         # Semi-transparent overlay
@@ -452,8 +456,7 @@ class Renderer:
         self.screen.blit(moves_text, moves_rect)
 
         # Buttons
-        next_button = Button(SCREEN_WIDTH // 2 - 100, SCREEN_HEIGHT // 2 +50, 200, 50, "Next Level", GREEN, (100, 255, 100))
-        next_button.draw(self.screen)
+        self.next_level_button.draw(self.screen)
 
         self.menu_button.update(pygame.mouse.get_pos())
         self.menu_button.draw(self.screen)
