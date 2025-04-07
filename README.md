@@ -29,12 +29,12 @@ This project recreates the classic Bloxorz puzzle game (without the teleport fea
 │   ├── problem.py                       # Problem Class
 │   └── uniform_cost_search.py           # Uniform-Cost search implementation
 │
-├── main.py                        # Entry point
-├── LICENSE                        # MIT License
-└── README.md                      # This documentation
-├── Time_Memory_Statistics.ods     # Statistics about each search algorithm
-├── rolltheblock_checkpoint.pdf    # Chekpoint presented
-└── rolltheblock_presentation.pdf  # Final Presentation
+├── main.py                              # Entry point
+├── LICENSE                              # MIT License
+└── README.md                            # This documentation
+├── Time_Memory_Statistics.ods           # Statistics about each search algorithm
+├── Roll_the_Block_checkpoint.pdf        # Chekpoint presented
+└── Roll_the_Block_final.pdf             # Final Presentation
 ```
 
 ## Game Rules
