@@ -5,7 +5,6 @@ class GameLogic:
         self.game_over = False
         self.level_completed = False
 
-    # Need to change everything related to block's position
     def check_win(self):
         if self.block.orientation == "upright":
             return self.board.is_goal((self.block.x1, self.block.y1))

@@ -1,8 +1,6 @@
 from collections import deque
-import matplotlib.pyplot as plt
 from memory_profiler import memory_usage
 import pygame
-from pprint import pprint
 import time
 from game.block import Block
 from game.board import Board
@@ -49,6 +47,7 @@ AI_OR_HUMAN = 6
 ALGORITHMS_LEVEL_SELECT = 7
 ALGORITHMS = 8
 AI_PLAYING = 9
+AI_LEVEL_COMPLETE = 10
 
 
 # All buttons shape and color
@@ -228,7 +227,7 @@ class Renderer:
         elif self.game_state == GAME_OVER:
             self.draw_level()
             self.draw_game_over()
-        elif self.game_state == LEVEL_COMPLETE:
+        elif self.game_state == LEVEL_COMPLETE or self.game_state == AI_LEVEL_COMPLETE:
             self.draw_level()
             self.draw_level_complete()
 
@@ -261,33 +260,40 @@ class Renderer:
         if self.back_button.is_clicked(mouse_pos):
             self.game_state = MAIN_MENU
 
-    def handle_ai_or_human(self, mouse_pos):
-        self.back_button.update(mouse_pos)
-        self.human_button.update(mouse_pos)
-        self.ai_button.update(mouse_pos)
+    def draw_rules_screen(self):
+        # Draw title
+        font = pygame.font.Font(None, 40)
+        title = font.render("Game Rules", True, BLUE)
+        title_rect = title.get_rect(center=(SCREEN_WIDTH // 2, 50))
+        self.screen.blit(title, title_rect)
 
-        if self.back_button.is_clicked(mouse_pos):
-            self.game_state = MAIN_MENU
-        elif self.human_button.is_clicked(mouse_pos):
-            self.game_state = LEVEL_SELECT
-        elif self.ai_button.is_clicked(mouse_pos):
-            self.game_state = ALGORITHMS_LEVEL_SELECT
+        rules = [
+            "MOVEMENT KEYS:"
+            "   WASD or ARROWS",
+            "",
+            "BLOCK STATES:",
+            "   -Upright: Can be on regular floor,",
+            "                     but not on glass floor",
+            "   -Horizontal/Vertical: Can be on any type of floor",
+            "",
+            "GAME ELEMENTS:",
+            "   -Blue tile: Regular Floor",
+            "   -Green tile: Goal",
+            "   -Yellow tile: Button that activates hiddent paths",
+            "   -Black tile: Void",
+            "   -Glass Floor: The block can only traverse it on the",
+            "                             horizontal/vertical states",
+        ]
 
-    def handle_algorithms(self, mouse_pos):
-        self.back_button.update(mouse_pos)
-        for button in self.algorithm_buttons:
-            button.update(mouse_pos)
+        font = pygame.font.Font(None, 24)
+        for i, line in enumerate(rules):
+            text = font.render(line, True, BLACK)
+            self.screen.blit(text, (100, 120 + i * 25))
 
-        if self.back_button.is_clicked(mouse_pos):
-            self.game_state = AI_OR_HUMAN
-        for button in self.algorithm_buttons:
-            for i, button in enumerate(self.algorithm_buttons):
-                button.update(mouse_pos)
-                if button.is_clicked(mouse_pos):
-                    self.algorithm = button.text.lower()
-                    self.initialize_level(self.level_name, AI=True)
-                    self.game_state = AI_PLAYING
+        # Draw back button
+        self.back_button.draw(self.screen)
 
+    # GAME_STATE 2 - LEVEL_SELECT
     def handle_level_select(self, mouse_pos):
         self.back_button.update(mouse_pos)
 
@@ -304,17 +310,21 @@ class Renderer:
                     self.initialize_level(self.level_name)
                     self.game_state = PLAYING
 
-    def handle_game_over(self, mouse_pos):
-        self.restart_button.update(mouse_pos)
-        self.menu_button.update(mouse_pos)
-        self.retry_button.update(mouse_pos)
+    def draw_level_select(self):
+        # Draw title
+        font = pygame.font.Font(None, 48)
+        title = font.render("Select Level", True, BLUE)
+        title_rect = title.get_rect(center=(SCREEN_WIDTH // 2, 60))
+        self.screen.blit(title, title_rect)
 
-        if self.retry_button.is_clicked(mouse_pos):
-            self.initialize_level(self.current_level)
-            self.game_state = PLAYING
-        elif self.menu_button.is_clicked(mouse_pos):
-            self.game_state = MAIN_MENU
+        # Draw level buttons
+        for button in self.level_buttons:
+            button.draw(self.screen)
 
+        # Draw back button
+        self.back_button.draw(self.screen)
+
+    # GAME_STATE 3 - PLAYING
     def handle_playing(self, mouse_pos):
         self.menu_button.update(mouse_pos)
         self.restart_button.update(mouse_pos)
@@ -327,17 +337,124 @@ class Renderer:
         if self.game_logic.game_over:
             self.game_state = GAME_OVER
 
+    # GAME_STATE 4 - GAME_OVER
+    def handle_game_over(self, mouse_pos):
+        self.restart_button.update(mouse_pos)
+        self.menu_button.update(mouse_pos)
+        self.retry_button.update(mouse_pos)
+
+        if self.retry_button.is_clicked(mouse_pos):
+            self.initialize_level(self.current_level)
+            self.game_state = PLAYING
+        elif self.menu_button.is_clicked(mouse_pos):
+            self.game_state = MAIN_MENU
+
+    def draw_game_over(self):
+        # Semi-transparent overlay
+        overlay = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA)
+        overlay.fill((0, 0, 0, 150))
+        self.screen.blit(overlay, (0, 0))
+
+        # Game over text
+        font = pygame.font.Font(None, 72)
+        text = font.render("Game Over", True, RED)
+        text_rect = text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 -50))
+        self.screen.blit(text, text_rect)
+
+        # Buttons
+        self.retry_button.draw(self.screen)
+
+    # GAME_STATE 5 - LEVEL_COMPLETE
     def handle_level_complete(self, mouse_pos):
         self.menu_button.update(mouse_pos)
         self.next_level_button.update(mouse_pos)
 
         if self.next_level_button.is_clicked(mouse_pos):
-            self.board.switch_level()
-            next_level = self.board.level.level_name
-            self.initialize_level(next_level)
-            self.game_state = PLAYING
+            if self.game_state == AI_LEVEL_COMPLETE:
+                self.game_state = ALGORITHMS_LEVEL_SELECT
+            else:
+                self.board.switch_level()
+                next_level = self.board.level.level_name
+                self.initialize_level(next_level)
+                self.game_state = PLAYING
         elif self.menu_button.is_clicked(mouse_pos):
             self.game_state = MAIN_MENU
+
+    def draw_level_complete(self):
+        # Semi-transparent overlay
+        overlay = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA)
+        overlay.fill((0, 0, 0, 150))
+        self.screen.blit(overlay, (0, 0))
+
+        # Level complete text
+        font = pygame.font.Font(None, 72)
+        text = font.render("Level Complete!", True, RED)
+        text_rect = text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 -50))
+        self.screen.blit(text, text_rect)
+
+        # Display move count
+        font = pygame.font.Font(None, 36)
+        moves_text = font.render(f"Moves: {self.block.move_counter}", True, WHITE)
+        moves_rect = moves_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
+        self.screen.blit(moves_text, moves_rect)
+
+        # Buttons
+        self.next_level_button.draw(self.screen)
+
+        self.menu_button.update(pygame.mouse.get_pos())
+        self.menu_button.draw(self.screen)
+
+    # GAME_STATE 6 - AI_OR_HUMAN
+    def handle_ai_or_human(self, mouse_pos):
+        self.back_button.update(mouse_pos)
+        self.human_button.update(mouse_pos)
+        self.ai_button.update(mouse_pos)
+
+        if self.back_button.is_clicked(mouse_pos):
+            self.game_state = MAIN_MENU
+        elif self.human_button.is_clicked(mouse_pos):
+            self.game_state = LEVEL_SELECT
+        elif self.ai_button.is_clicked(mouse_pos):
+            self.game_state = ALGORITHMS_LEVEL_SELECT
+
+    def draw_ai_or_human(self):
+        # Draw title
+        font = pygame.font.Font(None, 48)
+        title = font.render("Play as Human or AI?", True, BLUE)
+        title_rect = title.get_rect(center=(SCREEN_WIDTH // 2, 60))
+        self.screen.blit(title, title_rect)
+
+        # Draw buttons
+        self.human_button.draw(self.screen)
+        self.ai_button.draw(self.screen)
+        self.back_button.draw(self.screen)
+
+    # GAME_STATE 8 - ALGORITHMS
+    def handle_algorithms(self, mouse_pos):
+        self.back_button.update(mouse_pos)
+        for button in self.algorithm_buttons:
+            button.update(mouse_pos)
+
+        if self.back_button.is_clicked(mouse_pos):
+            self.game_state = AI_OR_HUMAN
+        for button in self.algorithm_buttons:
+            for i, button in enumerate(self.algorithm_buttons):
+                button.update(mouse_pos)
+                if button.is_clicked(mouse_pos):
+                    self.algorithm = button.text.lower()
+                    self.initialize_level(self.level_name, AI=True)
+                    self.game_state = AI_PLAYING
+
+    def draw_algorithms(self):
+        # Draw title
+        font = pygame.font.Font(None, 48)
+        title = font.render("Choose the search algorithm", True, BLUE)
+        title_rect = title.get_rect(center=(SCREEN_WIDTH // 2, 60))
+        self.screen.blit(title, title_rect)
+
+        # Draw buttons
+        for button in self.algorithm_buttons:
+            button.draw(self.screen)
 
     def start_animation(self, direction):
         self.animation_active = True
@@ -353,82 +470,6 @@ class Renderer:
         temp_block.move(direction)
 
         self.target_block_position = (temp_block.x1, temp_block.y1, temp_block.x2, temp_block.y2)
-
-    def draw_rules_screen(self):
-        # Draw title
-        font = pygame.font.Font(None, 40)
-        title = font.render("Game Rules", True, BLUE)
-        title_rect = title.get_rect(center=(SCREEN_WIDTH // 2, 50))
-        self.screen.blit(title, title_rect)
-
-        rules = [
-            "Roll the Block é um jogo de quebra-cabeças, no qual o jogador controla"
-            " os movimentos de um bloco, que se move por um tabuleiro, com o objetivo"
-            " de o colocar num local específico.",
-            "Movimentos das teclas:"
-            " -W: Cima",
-            " -S: Baixo",
-            " -A: Esquerda",
-            " -D: Direita",
-            "Posições do bloco:",
-            " -Bloco de pé: pode estar no chão regular,",
-            " mas parte o chão de vidro",
-            " -Bloco na horizontal/vertical: pode estar tanto no",
-            " chão regular como em chão de vidro",
-            "Elementos do jogo:",
-            " -Chão azul: Chão regular",
-            " -Chão verde: Objetivo",
-            " -Botão amarelo: Ativa caminhos escondidos quando o bloco",
-            " o pressiona",
-            " -Espaço preto: Se o bloco cair aqui, o jogo acaba",
-            " -Chão de vidro: O bloco só consegue andar neste chão se",
-            " estiver na horizontal ou na vertical"
-        ]
-
-        font = pygame.font.Font(None, 24)
-        for i, line in enumerate(rules):
-            text = font.render(line, True, BLACK)
-            self.screen.blit(text, (100, 120 + i * 25))
-
-        # Draw back button
-        self.back_button.draw(self.screen)
-
-    def draw_level_select(self):
-        # Draw title
-        font = pygame.font.Font(None, 48)
-        title = font.render("Select Level", True, BLUE)
-        title_rect = title.get_rect(center=(SCREEN_WIDTH // 2, 60))
-        self.screen.blit(title, title_rect)
-
-        # Draw level buttons
-        for button in self.level_buttons:
-            button.draw(self.screen)
-
-        # Draw back button
-        self.back_button.draw(self.screen)
-
-    def draw_ai_or_human(self):
-        # Draw title
-        font = pygame.font.Font(None, 48)
-        title = font.render("Play as AI or Human?", True, BLUE)
-        title_rect = title.get_rect(center=(SCREEN_WIDTH // 2, 60))
-        self.screen.blit(title, title_rect)
-
-        # Draw buttons
-        self.human_button.draw(self.screen)
-        self.ai_button.draw(self.screen)
-        self.back_button.draw(self.screen)
-
-    def draw_algorithms(self):
-        # Draw title
-        font = pygame.font.Font(None, 48)
-        title = font.render("Choose the search algorithm", True, BLUE)
-        title_rect = title.get_rect(center=(SCREEN_WIDTH // 2, 60))
-        self.screen.blit(title, title_rect)
-
-        # Draw buttons
-        for button in self.algorithm_buttons:
-            button.draw(self.screen)
 
     def draw_solve_options(self):
         if hasattr(self, 'show_solution') and self.show_solution:
@@ -467,8 +508,9 @@ class Renderer:
                         pygame.draw.rect(self.screen, BLACK, (x, y, TILE_SIZE, TILE_SIZE), 1)
 
         # Draw UI elements
-        self.menu_button.draw(self.screen)
-        self.restart_button.draw(self.screen)
+        if self.game_state != AI_PLAYING:
+            self.menu_button.draw(self.screen)
+            self.restart_button.draw(self.screen)
 
         # Draw level information
         font = pygame.font.Font(None, 32)
@@ -484,46 +526,10 @@ class Renderer:
             pygame.time.delay(1000)
         elif self.solution is not None and not self.solution:
             pygame.time.delay(1000)
-            self.game_state = LEVEL_COMPLETE
-
-    def draw_game_over(self):
-        # Semi-transparent overlay
-        overlay = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA)
-        overlay.fill((0, 0, 0, 150))
-        self.screen.blit(overlay, (0, 0))
-
-        # Game over text
-        font = pygame.font.Font(None, 72)
-        text = font.render("Game Over", True, RED)
-        text_rect = text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 -50))
-        self.screen.blit(text, text_rect)
-
-        # Buttons
-        self.retry_button.draw(self.screen)
-
-    def draw_level_complete(self):
-        # Semi-transparent overlay
-        overlay = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA)
-        overlay.fill((0, 0, 0, 150))
-        self.screen.blit(overlay, (0, 0))
-
-        # Level complete text
-        font = pygame.font.Font(None, 72)
-        text = font.render("Level Complete!", True, RED)
-        text_rect = text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 -50))
-        self.screen.blit(text, text_rect)
-
-        # Display move count
-        font = pygame.font.Font(None, 36)
-        moves_text = font.render(f"Moves: {self.block.move_counter}", True, WHITE)
-        moves_rect = moves_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
-        self.screen.blit(moves_text, moves_rect)
-
-        # Buttons
-        self.next_level_button.draw(self.screen)
-
-        self.menu_button.update(pygame.mouse.get_pos())
-        self.menu_button.draw(self.screen)
+            self.solution = None
+            self.algorithm = None
+            self.algorithm_completed = False
+            self.game_state = AI_LEVEL_COMPLETE
 
     def update_animation(self):
         pygame.display.flip()
@@ -537,7 +543,10 @@ class Renderer:
 
             if self.game_logic.level_completed:
                 self.game_logic.level_completed = False
-                self.game_state = LEVEL_COMPLETE
+                if self.game_state == PLAYING:
+                    self.game_state = LEVEL_COMPLETE
+                elif self.game_state == AI_PLAYING:
+                    self.game_state = AI_LEVEL_COMPLETE
 
             self.draw()
             self.update_animation()

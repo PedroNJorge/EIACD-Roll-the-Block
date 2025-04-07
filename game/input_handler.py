@@ -12,6 +12,7 @@ AI_OR_HUMAN = 6
 ALGORITHMS_LEVEL_SELECT = 7
 ALGORITHMS = 8
 AI_PLAYING = 9
+AI_LEVEL_COMPLETE = 10
 
 
 class InputHandler:
@@ -45,11 +46,6 @@ class InputHandler:
                     self.block.move("left")
                 case pygame.K_d | pygame.K_RIGHT:
                     self.block.move("right")
-        else:
-            if self.renderer.solution:
-                self.block.move(self.renderer.solution.popleft())
-            else:
-                self.renderer.game_state = LEVEL_COMPLETE
 
         self.board.refresh_layout(self.block)
         self.game_logic.update()
@@ -69,7 +65,7 @@ class InputHandler:
                     self.renderer.handle_playing(mouse_pos)
                 case 4:
                     self.renderer.handle_game_over(mouse_pos)
-                case 5:
+                case 5 | 10:
                     self.renderer.handle_level_complete(mouse_pos)
                 case 6:
                     self.renderer.handle_ai_or_human(mouse_pos)
