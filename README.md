@@ -7,23 +7,34 @@ This project recreates the classic Bloxorz puzzle game (without the teleport fea
 
 ```
 .
-├── environment.yml                # Conda environment configuration
-├── game/                          # Core game implementation
-│   ├── __init__.py                # Makes 'game' a package
-│   ├── block.py                   # Block physics and state management
-│   ├── board.py                   # Game board
-│   ├── game_logic.py              # Main game rules and state transitions
-│   ├── input_handler.py           # User input processing
-│   ├── levels.py                  # Level definitions and parsing
-│   └── renderer.py                # Visualization and graphics
-├── search_algorithms/             # AI solvers
-│   ├── a_star.py                  # A* search implementation
-│   ├── best_first_search.py       # Best-first search implementation
-│   ├── bfs.py                     # Breadth-first search
-│   └── dfs.py                     # Depth-first search
+├── environment.yml                      # Conda environment configuration
+├── game/                                # Core game implementation
+│   ├── __init__.py                      # Makes 'game' a package
+│   ├── block.py                         # Block physics and state management
+│   ├── board.py                         # Game board
+│   ├── game_logic.py                    # Main game rules and state transitions
+│   ├── input_handler.py                 # User input processing
+│   ├── levels.py                        # Level definitions and parsing
+│   └── renderer.py                      # Visualization and graphics
+├── search_algorithms/                   # AI solvers
+│   ├── __init__.py                      # Makes 'search_algorithms' a package
+│   ├── a_star.py                        # A* search implementation
+│   ├── breadth_first_search.py          # Breadth-first search implementation
+│   ├── depth_first_search.py            # Depth-first search implementation
+│   ├── expand.py                        # Function responsible to expand nodes
+│   ├── greedy_search.py                 # Greedy search implementation
+│   ├── heuristic.py                     # Heuristic Function
+│   ├── iterative_deepening_search.py    # Iterative deepening search implementation
+│   ├── node.py                          # Node Class
+│   ├── problem.py                       # Problem Class
+│   └── uniform_cost_search.py           # Uniform-Cost search implementation
+│
 ├── main.py                        # Entry point
 ├── LICENSE                        # MIT License
 └── README.md                      # This documentation
+├── Time_Memory_Statistics.ods     # Statistics about each search algorithm
+├── rolltheblock_checkpoint.pdf    # Chekpoint presented
+└── rolltheblock_presentation.pdf  # Final Presentation
 ```
 
 ## Game Rules
