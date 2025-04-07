@@ -77,7 +77,6 @@ class Board:
             for button in self.level.button.keys():
                 for hidden_path_coordinate in self.level.button[button][1]:
                     x, y = hidden_path_coordinate
-                    print(hidden_path_coordinate)
                     if self.level.button[button][0]:
                         self.level.layout[x][y] = 0
                     else:

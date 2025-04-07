@@ -160,33 +160,39 @@ class Renderer:
             match self.algorithm:
                 case "a*":
                     start = time.perf_counter()
-                    # solution_node = a_star(problem)
-                    mem_usage, solution = memory_usage((a_star, (problem,)), retval=True)
+                    solution_node = a_star(problem)
+                    # mem_usage, solution_node = memory_usage((a_star, (problem,)), retval=True)
                     end = time.perf_counter()
                 case "bfs":
+                    start = time.perf_counter()
                     solution_node = breadth_first_search(problem)
+                    # mem_usage, solution_node = memory_usage((breadth_first_search, (problem,)), retval=True)
+                    end = time.perf_counter()
                 case "dfs":
+                    start = time.perf_counter()
                     solution_node = depth_first_search(problem)
+                    # mem_usage, solution_node = memory_usage((depth_first_search, (problem,)), retval=True)
+                    end = time.perf_counter()
                 case "greedy":
+                    start = time.perf_counter()
                     solution_node = greedy_search(problem)
+                    # mem_usage, solution_node = memory_usage((greedy_search, (problem,)), retval=True)
+                    end = time.perf_counter()
                 case "ucs":
+                    start = time.perf_counter()
                     solution_node = uniform_cost_search(problem)
+                    # mem_usage, solution_node = memory_usage((uniform_cost_search, (problem,)), retval=True)
+                    end = time.perf_counter()
                 case "ids":
+                    start = time.perf_counter()
                     solution_node = iterative_deepening_search(problem)
+                    # mem_usage, solution_node = memory_usage((iterative_deepening_search, (problem,)), retval=True)
+                    end = time.perf_counter()
 
-            # Plotting
-            plt.plot(mem_usage)
-            plt.ylabel('Memory (MiB)')
-            plt.xlabel('Time')
-            plt.title(f'Memory usage for {self.algorithm}')
-            plt.show()
-
-            print(f"Algorithm took {(end - start)*1000:.6f} ms")
+            print(f"Algorithm {self.algorithm} took {(end - start)*1000:.6f} ms")
+            # print(f"Peak Memory usage: {max(mem_usage):.2f} MiB")
 
             if solution_node is not None:
-                print("---------------------FINISHED-----------------------------")
-                pprint(solution_node.state)
-
                 self.solution = deque()
                 prev_node = solution_node.parent
                 self.solution.appendleft(solution_node.action)
@@ -196,8 +202,6 @@ class Renderer:
                     prev_node = prev_node.parent
 
                 self.solution.popleft()
-                print(self.solution)
-                print(f"Moves made: {len(self.solution)}")
                 self.algorithm_completed = True
 
     def calculate_camera_offset(self):
@@ -475,7 +479,6 @@ class Renderer:
         self.screen.blit(moves_text, (20, 60))
 
         if self.game_state == AI_PLAYING and self.solution:
-            print(self.solution)
             self.block.move(self.solution.popleft())
             self.board.refresh_layout(self.block)
             pygame.time.delay(1000)

@@ -47,7 +47,6 @@ class InputHandler:
                     self.block.move("right")
         else:
             if self.renderer.solution:
-                print(self.renderer.solution)
                 self.block.move(self.renderer.solution.popleft())
             else:
                 self.renderer.game_state = LEVEL_COMPLETE
